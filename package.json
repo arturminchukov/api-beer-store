@@ -1,0 +1,34 @@
+{
+    "name": "api-beer-store",
+    "version": "1.0.0",
+    "description": "api for beer-store",
+    "main": "app.js",
+    "scripts": {
+        "start": "node app.js",
+        "debug": "node --inspect-brk app.js",
+        "lint": "./node_modules/.bin/eslint src/",
+        "lint-fix": "./node_modules/.bin/eslint --autofix src/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/arturminchukov/api-beer-store.git"
+    },
+    "author": "Artur Minchukov",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/arturminchukov/api-beer-store/issues"
+    },
+    "homepage": "https://github.com/arturminchukov/api-beer-store#readme",
+    "dependencies": {
+        "axios": "^0.18.0",
+        "body-parser": "^1.18.3",
+        "express": "^4.16.4",
+        "pg": "^7.8.0",
+        "pg-hstore": "^2.3.2",
+        "sequelize": "^4.42.0"
+    },
+    "devDependencies": {
+        "eslint": "^5.12.1",
+        "husky": "^1.3.1"
+    }
+}
