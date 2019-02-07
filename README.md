@@ -1,7 +1,7 @@
 #api-beer-store
 
 ##stack
- postgresql database - 10.6 
+ postgresql database - 10.6\
  node - 10.14.1
  
 
