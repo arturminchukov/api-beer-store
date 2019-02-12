@@ -1,25 +1,31 @@
-const apiUrl = 'https://api.punkapi.com/v2/beers';
+const config = require('config');
+const {apiUrl} = config.get('constants');
 const axios = require('axios');
+const statuses = require('statuses');
 
 class BeerRepository {
-    async requestResponse(parameters) {
-        const url = `${apiUrl}${parameters}`;
-        const result = await axios.get(url);
-        const {data} = result;
+    async get(url, params) {
+        try {
+            const apiInstance = axios.create({
+                baseURL: apiUrl
+            });
+            const result = await apiInstance.request({
+                url,
+                params
+            });
+            const {data} = result;
 
-        return data;
-    }
+            return data;
+        } catch (e) {
+            const statusCode = 424;
 
-    getBeers(page = 1, itemsPerPage = 10) {
-        return this.requestResponse(`?page=${page}&per_page=${itemsPerPage}`);
-    }
+            const error = {
+                statusCode,
+                message: statuses.STATUS_CODES[statusCode]
+            };
 
-    getBeerById(id) {
-        return this.requestResponse(`/${id}`);
-    }
-
-    getBeersByQuery(beerName) {
-        return this.requestResponse(`?beer_name=${encodeURIComponent(beerName)}`);
+            throw error;
+        }
     }
 }
 

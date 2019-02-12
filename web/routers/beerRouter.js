@@ -2,10 +2,10 @@ const express = require('express');
 const router = new express.Router();
 const {beerController} = require('../controllers');
 
-const handleBeers = beerController.handleBeers.bind(beerController);
-const handleBeer = beerController.handleBeer.bind(beerController);
+const getBeer = beerController.getBeer.bind(beerController);
+const getBeers = beerController.getBeers.bind(beerController);
 
-router.get('/:id', handleBeer);
-router.get('/', handleBeers);
+router.get('/:id', getBeer);
+router.get('/', getBeers);
 
 module.exports = router;

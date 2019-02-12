@@ -1,5 +1,7 @@
 const beersRouter = require('./beerRouter');
 
-module.exports = {
-    beersRouter,
+const configureRoutes = function (app) {
+    app.use('/beers', beersRouter);
 };
+
+module.exports = configureRoutes;
