@@ -1,20 +1,32 @@
 const {beerRepository} = require('../../dataAccess/repository');
 
+
 class BeerService {
-    getBeers(query) {
-        if (query && query.beer_name) {
-            return beerRepository.getBeersByQuery(query.beer_name);
-        }
+    constructor() {
+        this.entityName = 'beers';
+    }
 
-        const {page, per_page: perPage} = query;
+    async getBeers(params) {
+        if (params) {
+            const data = await beerRepository.get(this.entityName, params);
 
-        if (page && perPage) {
-            return beerRepository.getBeers(page, perPage);
+            return this.createResult(data, params.page, params.per_page);
         }
     }
 
-    getBeer(beerId) {
-        return beerRepository.getBeerById(beerId);
+    async getBeer(beerId) {
+        const data = await beerRepository.get(`${this.entityName}/${beerId}`);
+
+        return this.createResult(data);
+    }
+
+    createResult(items, page, perPage) {
+        return {
+            page: page || 0,
+            perPage: perPage || 0,
+            items: items || [],
+            count: items.length || 0
+        };
     }
 }
 
