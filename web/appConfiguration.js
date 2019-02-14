@@ -1,4 +1,5 @@
 const bodyParser = require('body-parser');
+const {errorController} = require('./controllers');
 
 const configureParsers = function (app) {
     app.use(bodyParser.urlencoded({extended: false}));
@@ -13,7 +14,13 @@ const configureHeader = function (app) {
     });
 };
 
+const configureErrorHandlers = function (app) {
+    app.use(errorController.logError);
+    app.use(errorController.errorHandler);
+};
+
 module.exports = {
     configureParsers,
-    configureHeader
+    configureHeader,
+    configureErrorHandlers
 };
