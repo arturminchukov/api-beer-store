@@ -1,49 +1,44 @@
-const config = require('config');
 const {beerService} = require('../../application').services;
-const {validFilterParams, validParams} = config.get('constants');
-const statuses = require('statuses');
+const {VALID_PAGE_PARAMS, VALID_FILTER_PARAMS, DEFAULT_PAGE, DEFAULT_PER_PAGE} = require('../../constants').beers;
+
 
 class BeerController {
-    async getBeers(req, res) {
-        try {
-            const {query} = req;
-            let result = null;
+    async getBeers(req, res, next) {
+        const {query} = req;
+        const filterParams = this.filterByParams(query, VALID_FILTER_PARAMS);
+        const pageParams = this.filterByParams(query, VALID_PAGE_PARAMS);
 
-            if (query.beer_name) {
-                const params = this.filterByParams(query, validFilterParams);
+        let result = null;
 
-                result = await beerService.getBeers(params);
-            } else if (query.page && query.per_page) {
-                const params = this.filterByParams(query, validParams);
-
-                result = await beerService.getBeers(params);
-            } else {
-                const statusCode = 421;
-
-                res.status(statusCode);
-                result = {
-                    statusCode,
-                    message: statuses.STATUS_CODES[statusCode]
-                };
-            }
-
-            res.send(result);
-        } catch (e) {
-            res.status(e.statusCode)
-                .send(e);
+        if (!pageParams.page) {
+            pageParams.page = DEFAULT_PAGE;
         }
+
+        if (!pageParams.perPage) {
+            pageParams.perPage = DEFAULT_PER_PAGE;
+        }
+
+        try {
+            result = await beerService.getBeers(pageParams, filterParams);
+        } catch (error) {
+            return next(error);
+        }
+
+        res.send(result);
     }
 
-    async getBeer(req, res) {
-        try {
-            const beerId = req && req.params && req.params.id;
-            const result = await beerService.getBeer(beerId);
+    async getBeer(req, res, next) {
+        const beerId = req && req.params && req.params.id;
 
-            res.send(result);
-        } catch (e) {
-            res.status(e.statusCode)
-                .send(e);
+        let result = null;
+
+        try {
+            result = await beerService.getBeer(beerId);
+        } catch (error) {
+            return next(error);
         }
+
+        res.send(result);
     }
 
     filterByParams(query, paramNames) {

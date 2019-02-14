@@ -1,29 +1,23 @@
 const {beerRepository} = require('../../dataAccess/repository');
-
+const {DEFAULT_PER_PAGE, DEFAULT_PAGE} = require('../../constants').beers;
 
 class BeerService {
-    constructor() {
-        this.entityName = 'beers';
-    }
+    async getBeers(pageParams, filterParams) {
+        const beers = await beerRepository.getAll(pageParams, filterParams);
 
-    async getBeers(params) {
-        if (params) {
-            const data = await beerRepository.get(this.entityName, params);
-
-            return this.createResult(data, params.page, params.per_page);
-        }
+        return this.createResult(beers, pageParams.page, pageParams.perPage);
     }
 
     async getBeer(beerId) {
-        const data = await beerRepository.get(`${this.entityName}/${beerId}`);
+        const beer = await beerRepository.get(beerId);
 
-        return this.createResult(data);
+        return this.createResult(beer, 1, 1);
     }
 
     createResult(items, page, perPage) {
         return {
-            page: page || 0,
-            perPage: perPage || 0,
+            page: page || DEFAULT_PAGE,
+            perPage: perPage || DEFAULT_PER_PAGE,
             items: items || [],
             count: items.length || 0
         };
