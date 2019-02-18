@@ -1,5 +1,9 @@
-const NoBeerResultError = require('./noBeerResultError');
+const NotFoundError = require('./notFoundError');
+const InternalServerError = require('./internalServerError');
+const FailedDependecyError = require('./failedDependecyError');
 
 module.exports = {
-    NoBeerResultError
+    NotFoundError,
+    InternalServerError,
+    FailedDependecyError
 };
