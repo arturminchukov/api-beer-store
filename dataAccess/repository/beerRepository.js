@@ -1,9 +1,8 @@
 const config = require('config');
 
 const axios = require('axios');
-const statuses = require('statuses');
-const {NoBeerResultError} = require('../../errors');
-const {MAP_PARAMS} = require('../../constants').beers;
+const {NotFoundError, InternalServerError, FailedDependecyError} = require('../../errors');
+const {MAP_FILTER_PARAMS, MAP_PAGE_PARAMS} = require('../../constants').dataAccess;
 
 const API_URL = config.get('EXTERNAL_RESOURCES.API_URL');
 
@@ -16,16 +15,33 @@ class BeerRepository {
         this.entity = 'beers';
     }
 
-    async request({url, params}) {
-        const result = await this.apiInstance.request({
-            url,
-            params
-        });
+    async _request(url, params) {
+        let result = null;
+
+        try {
+            result = await this.apiInstance.request({
+                url,
+                params
+            });
+        } catch (error) {
+            const errorStatusCode = error.response && error.response.data && error.response.data.statusCode;
+            let resultError = null;
+
+            if (errorStatusCode >= 500) {
+                resultError = new FailedDependecyError('Punkapi server not response', error);
+            } else if (errorStatusCode === 404) {
+                resultError = new NotFoundError('Beer was not found', error);
+            } else {
+                resultError = new InternalServerError('Server cannot load beer information', error);
+            }
+
+            throw resultError;
+        }
 
         return result.data;
     }
 
-    mapParams(params, mapper) {
+    _mapParams(params, mapper) {
         const newParams = {};
         const paramKeys = Object.keys(params);
 
@@ -37,66 +53,24 @@ class BeerRepository {
     }
 
     async getAll(pageParams, filterParams) {
-        const params = this.mapParams({
-            ...pageParams,
-            ...filterParams
-        }, MAP_PARAMS);
+        const mappedPageParams = this._mapParams(pageParams, MAP_PAGE_PARAMS);
+        const mappedFilterParams = this._mapParams(filterParams, MAP_FILTER_PARAMS);
 
-        let beers = null;
-
-        try {
-            beers = await this.request({
-                url: `/${this.entity}`,
-                params
-            });
-
-        } catch (error) {
-            const errorStatusCode = error && error.response && error.response.data && error.response.data.statusCode;
-            let resultError = null;
-
-            if (errorStatusCode >= 500) {
-                const statusCode = 424;
-
-                resultError = {
-                    statusCode,
-                    message: statuses.STATUS_CODES[statusCode]
-                };
-            } else {
-                resultError = new NoBeerResultError('The specified parameters are not correct');
+        const beers = await this._request(
+            `/${this.entity}`,
+            {
+                ...mappedPageParams,
+                ...mappedFilterParams
             }
+        );
 
-            throw resultError;
-        }
-
-        return beers;
+        return beers || [];
     }
 
     async get(id) {
-        let beer = null;
+        const beers = await this._request(`/${this.entity}/${id}`);
 
-        try {
-            beer = await this.request({
-                url: `/${this.entity}/${id}`
-            });
-        } catch (error) {
-            const errorStatusCode = error && error.response && error.response.data && error.response.data.statusCode;
-            let resultError = null;
-
-            if (errorStatusCode >= 500) {
-                const statusCode = 424;
-
-                resultError = {
-                    statusCode,
-                    message: statuses.STATUS_CODES[statusCode]
-                };
-            } else {
-                resultError = new NoBeerResultError(`Beer with id ${id} was not found`);
-            }
-
-            throw resultError;
-        }
-
-        return beer;
+        return beers[0];
     }
 }
 

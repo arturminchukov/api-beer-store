@@ -1,5 +1,7 @@
-const beers = require('./beers');
+const web = require('./web');
+const dataAccess = require('./dataAccess');
 
 module.exports = {
-    beers
+    web,
+    dataAccess
 };
