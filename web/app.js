@@ -1,4 +1,5 @@
 const express = require('express');
+
 const {configureHeader, configureParsers, configureErrorHandlers, configureRoutes, configureLogger, configureErrorLogger} = require('./appConfiguration');
 
 const app = express();

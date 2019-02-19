@@ -1,12 +1,12 @@
 const {beerRepository} = require('../../dataAccess/repository');
 
 class BeerService {
-    async getBeers(pageParams, filterParams) {
-        const beers = await beerRepository.getAll(pageParams, filterParams);
+    async getBeers(paginationParams, filterParams) {
+        const beers = await beerRepository.getAll(paginationParams, filterParams);
 
         return {
-            pageNumber: pageParams.pageNumber,
-            perPage: pageParams.perPage,
+            pageNumber: paginationParams.pageNumber,
+            perPage: paginationParams.perPage,
             items: beers,
             count: beers.length
         };

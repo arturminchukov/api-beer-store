@@ -4,33 +4,12 @@ require('winston-daily-rotate-file');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const {beersRouter} = require('./routers');
-const {winstonLogger} = require('../modules').logger;
-const winston = require('winston');
+const {logger} = require('../modules');
 const morgan = require('morgan');
 
 const DEBUG = config.get('DEBUG');
 
-const transports = [new winston.transports.Console({
-    format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.timestamp(),
-        winston.format.align(),
-        winston.format.printf(info => `${info.timestamp} [${info.level}]: ${JSON.stringify(info)}`)
-    )
-})];
-
-if (!DEBUG) {
-    transports.push(new winston.transports.DailyRotateFile({
-        filename: 'log-%DATE%.log',
-        datePattern: 'YYYY-MM-DD',
-        maxFiles: '60d',
-        dirname: 'logs'
-    }));
-}
-
-const logger = winstonLogger(transports);
-
-const errorLogger = function (error, req, res, next) {
+const errorLogMiddleware = function (error, req, res, next) {
     logger.error({
         statusCode: error.statusCode,
         message: error.message,
@@ -47,33 +26,19 @@ const errorLogger = function (error, req, res, next) {
     next(error);
 };
 
-const errorHandler = function (error, req, res, next) {
+const errorHandleMiddleware = function (error, req, res, next) {
     res.status(error.statusCode);
     if (DEBUG) {
         res.send({
             statusCode: error.statusCode,
             message: error.message,
             stackTrace: error.stack,
-            initError: error.getInitErrorInfo(),
-            request: {
-                query: req.query || null,
-                params: req.params || null,
-                path: req.path,
-                method: req.method,
-                originalUrl: req.originalUrl
-            }
+            initError: error.getInitErrorInfo()
         });
     } else {
         res.send({
             message: error.message,
-            statusCode: error.statusCode,
-            request: {
-                query: req.query || null,
-                params: req.params || null,
-                path: req.path,
-                method: req.method,
-                originalUrl: req.originalUrl
-            }
+            statusCode: error.statusCode
         });
     }
 };
@@ -96,11 +61,11 @@ const configureRoutes = function (app) {
 };
 
 const configureErrorLogger = function (app) {
-    app.use(errorLogger);
+    app.use(errorLogMiddleware);
 };
 
 const configureErrorHandlers = function (app) {
-    app.use(errorHandler);
+    app.use(errorHandleMiddleware);
 };
 
 

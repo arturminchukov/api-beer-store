@@ -1,3 +1,6 @@
 module.exports = {
-    DEBUG: false
+    DEBUG: false,
+    LOGGER: {
+        MAX_TIME_FILES_STORE: '60d'
+    }
 };
