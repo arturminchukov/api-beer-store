@@ -11,5 +11,9 @@ module.exports = {
     EXTERNAL_RESOURCES: {
         API_URL: 'https://api.punkapi.com/v2'
     },
+    LOGGER: {
+        DEFAULT_LEVEL: 'info',
+        MAX_TIME_FILES_STORE: '1d'
+    },
     DEBUG: true
 };
