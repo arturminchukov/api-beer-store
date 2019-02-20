@@ -37,13 +37,13 @@ class BeerRepository {
     }
 
     async _request(url, params) {
-        let result = null;
-
         try {
-            result = await this.client.request({
+            const result = await this.client.request({
                 url,
                 params
             });
+
+            return result.data;
         } catch (error) {
             const errorStatusCode = error.response && error.response.data && error.response.data.statusCode;
             let resultError = null;
@@ -58,8 +58,6 @@ class BeerRepository {
 
             throw resultError;
         }
-
-        return result.data;
     }
 
     _mapParams(params, mapper) {
