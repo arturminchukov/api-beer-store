@@ -7,8 +7,7 @@ class BeerService {
         return {
             pageNumber: paginationParams.pageNumber,
             pageSize: paginationParams.pageSize,
-            items: beers,
-            count: beers.length
+            items: beers
         };
     }
 

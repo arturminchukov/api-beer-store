@@ -7,28 +7,25 @@ class BeerController {
         const filterParams = this._filterByParams(query, FILTER_PARAMS_SCHEMA);
         const pageParams = this._filterByParams(query, PAGINATION_PARAMS_SCHEMA);
 
-        let result = null;
-
         try {
-            result = await beerService.getBeers(pageParams, filterParams);
-        } catch (error) {
-            return next(error);
-        }
+            const result = await beerService.getBeers(pageParams, filterParams);
 
-        res.send(result);
+            res.send(result);
+        } catch (error) {
+            next(error);
+        }
     }
 
     async getBeer(req, res, next) {
         const beerId = req.params.id;
-        let result = null;
 
         try {
-            result = await beerService.getBeer(beerId);
+            const result = await beerService.getBeer(beerId);
+
+            res.send(result);
         } catch (error) {
             return next(error);
         }
-
-        res.send(result);
     }
 
     _filterByParams(query, paramNames) {
@@ -36,6 +33,7 @@ class BeerController {
             if (query[key]) {
                 params[key] = query[key];
             }
+
             return params;
         }, {});
     }

@@ -35,7 +35,7 @@
         "block-scoped-var": "error",
         "block-spacing": "error",
         "brace-style": "error",
-        "callback-return": "error",
+        "callback-return": "off",
         "capitalized-comments": [
             "error",
             "never"
