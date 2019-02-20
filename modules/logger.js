@@ -34,7 +34,9 @@ class Logger {
 
         this.stream = {
             write(message) {
-                logger.info(message);
+                if (!process.env.NODE_ENV || process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'debug') {
+                    logger.info(message);
+                }
             }
         };
 
