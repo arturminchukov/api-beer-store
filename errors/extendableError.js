@@ -13,6 +13,10 @@ class ExtendableError extends Error {
             return null;
         }
 
+        if (this.initError instanceof Array) {
+            return this.initError.map(error => `${error.keyword} ${error.dataPath} ${error.message}`);
+        }
+
         return {
             statusCode: this.initError.statusCode,
             message: this.initError.message,

@@ -1,11 +1,11 @@
 const NotFoundError = require('./notFoundError');
 const InternalServerError = require('./internalServerError');
 const FailedDependencyError = require('./failedDependecyError');
-const BadRequestError = require('./badRequestError');
+const UnprocessableEntityError = require('./unprocessableEntityError');
 
 module.exports = {
     NotFoundError,
     InternalServerError,
     FailedDependencyError,
-    BadRequestError
+    UnprocessableEntityError
 };

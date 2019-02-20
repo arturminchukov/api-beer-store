@@ -10,7 +10,7 @@ const MAP_FILTER_PARAMS = {
 
 const MAP_PAGE_PARAMS = {
     pageNumber: 'page',
-    perPage: 'per_page'
+    pageSize: 'per_page'
 };
 
 module.exports = {
