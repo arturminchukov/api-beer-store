@@ -9,6 +9,7 @@ class ExtendableError extends Error {
     }
 
     getInitErrorInfo() {
+        debugger;
         if (!this.initError) {
             return null;
         }

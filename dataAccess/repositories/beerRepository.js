@@ -3,6 +3,7 @@ const axios = require('axios');
 
 const {NotFoundError, InternalServerError, FailedDependencyError} = require('../../errors');
 const {MAP_FILTER_PARAMS, MAP_PAGE_PARAMS} = require('../constants');
+const {mapProperties} = require('../../helpers');
 
 const API_URL = config.get('EXTERNAL_RESOURCES.API_URL');
 
@@ -16,8 +17,8 @@ class BeerRepository {
     }
 
     async getAll(paginationParams, filterParams) {
-        const mappedPageParams = this._mapParams(paginationParams, MAP_PAGE_PARAMS);
-        const mappedFilterParams = this._mapParams(filterParams, MAP_FILTER_PARAMS);
+        const mappedPageParams = mapProperties(paginationParams, MAP_PAGE_PARAMS);
+        const mappedFilterParams = mapProperties(filterParams, MAP_FILTER_PARAMS);
 
         const beers = await this._request(
             `/${this.entity}`,
@@ -58,17 +59,6 @@ class BeerRepository {
 
             throw resultError;
         }
-    }
-
-    _mapParams(params, mapper) {
-        const newParams = {};
-        const paramKeys = Object.keys(params);
-
-        paramKeys.forEach((paramKey) => {
-            newParams[mapper[paramKey]] = params[paramKey];
-        });
-
-        return newParams;
     }
 }
 

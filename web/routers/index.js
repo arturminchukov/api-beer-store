@@ -1,5 +1,7 @@
-const beersRouter = require('./beerRouter');
+const beerRouter = require('./beerRouter');
+const userRouter = require('./userRouter');
 
 module.exports = {
-    beersRouter
+    beerRouter,
+    userRouter
 };
