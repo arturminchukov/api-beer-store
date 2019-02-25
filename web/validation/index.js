@@ -1,7 +1,7 @@
-const validatorFactory = require('./validatorFactory');
+const validationMiddlewareFactory = require('./validationMiddlewareFactory');
 const validationSchemes = require('./validationSchemes');
 
 module.exports = {
-    validatorFactory,
+    validationMiddlewareFactory,
     validationSchemes
 };
