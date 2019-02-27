@@ -14,6 +14,24 @@ const validationMiddlewareFactory = function (validationSchema, options) {
             ...defaultOptions,
             ...options
         });
+
+        ajv.addKeyword('removeIfEmpty', {
+            type: 'string',
+            compile() {
+                return function (data, dataPath, parentData) {
+                    if (data.trim() === '' || data === null) {
+                        const properties = dataPath.split('.');
+                        const dataProperty = properties[properties.length - 1];
+
+                        Reflect.deleteProperty(parentData, dataProperty);
+                    }
+
+                    return true;
+                };
+            },
+            errors: false
+        });
+
         const valid = ajv.validate(validationSchema, req);
 
         if (!valid) {

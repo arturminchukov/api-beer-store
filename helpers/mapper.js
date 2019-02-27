@@ -1,4 +1,4 @@
-const mapProperties = function (properties, mapper) {
+const mapper = function (properties, map) {
     if (!properties) {
         return;
     }
@@ -7,10 +7,10 @@ const mapProperties = function (properties, mapper) {
     const propertiesKeys = Object.keys(properties);
 
     propertiesKeys.forEach((paramKey) => {
-        newProperties[mapper[paramKey]] = properties[paramKey];
+        newProperties[map[paramKey]] = properties[paramKey];
     });
 
     return newProperties;
 };
 
-module.exports = mapProperties;
+module.exports = mapper;

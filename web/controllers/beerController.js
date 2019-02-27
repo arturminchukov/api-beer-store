@@ -1,4 +1,4 @@
-const {beerService} = require('../../application').services;
+const {beerService} = require('../../application/services');
 const {FILTER_PARAMS_SCHEMA, PAGINATION_PARAMS_SCHEMA} = require('../constants');
 
 class BeerController {

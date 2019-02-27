@@ -4,7 +4,7 @@ CREATE TABLE users (
     password VARCHAR(64) NOT NULL,
     first_name VARCHAR(64),
     last_name VARCHAR(64),
-    birthday DATE,
+    birthday INTEGER,
     image_url VARCHAR(512),
     salt VARCHAR(128) NOT NULL
 );

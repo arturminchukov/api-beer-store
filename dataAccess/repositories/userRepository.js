@@ -1,54 +1,18 @@
-const Sequelize = require('sequelize');
-const databaseInstance = require('../getDatabase');
-
-const {mapProperties} = require('../../helpers');
-const {MAP_APPLICATION_PROPERTIES_TO_DATABASE, MAP_DATABASE_PROPERTIES_TO_APPLICATION} = require('../constants');
-const {FailedDependencyError, InternalServerError, NotFoundError} = require('../../errors');
+const sequelize = require('../getSequelize');
+const {userModel} = require('../models');
+const {mapper} = require('../../helpers');
+const {SQL_ERRORS} = require('../constants');
+const {MAP_APPLICATION_PROPERTIES_TO_DATABASE, MAP_DATABASE_PROPERTIES_TO_APPLICATION} = require('../mappers');
+const {FailedDependencyError, InternalServerError, NotFoundError, UnprocessableEntityError} = require('../../errors');
 
 class UserRepository {
-    constructor() {
-        this.model = databaseInstance.define('user', {
-            id: {
-                type: Sequelize.INTEGER,
-                autoIncrement: true,
-                primaryKey: true
-            },
-            email: {
-                type: Sequelize.STRING(64),
-                allowNull: false,
-                unique: true
-            },
-            password: {
-                type: Sequelize.STRING(64)
-            },
-            first_name: {
-                type: Sequelize.STRING(64)
-            },
-            last_name: {
-                type: Sequelize.STRING(64)
-            },
-            birthday: {
-                type: Sequelize.DATEONLY
-            },
-            image_url: {
-                type: Sequelize.STRING(512)
-            },
-            salt: {
-                type: Sequelize.STRING(128),
-                allowNull: false
-            }
-        }, {
-            underscored: true,
-            timestamps: false
-        });
+    constructor(model) {
+        this.model = model;
     }
 
-    getUserByEmail(email) {
-        return this.getUser({email});
-    }
-
+    /*TODO: refactor it for login route*/
     async getUser(options) {
-        const validOptions = mapProperties(options, MAP_APPLICATION_PROPERTIES_TO_DATABASE);
+        const validOptions = mapper(options, MAP_APPLICATION_PROPERTIES_TO_DATABASE);
         let result = null;
 
         try {
@@ -71,28 +35,32 @@ class UserRepository {
             throw new NotFoundError('The user was not found');
         }
 
-        result = mapProperties(result.dataValues, MAP_DATABASE_PROPERTIES_TO_APPLICATION);
+        result = mapper(result.dataValues, MAP_DATABASE_PROPERTIES_TO_APPLICATION);
 
         return result;
     }
 
     async createUser(user) {
-        const userProperties = mapProperties(user, MAP_APPLICATION_PROPERTIES_TO_DATABASE);
+        const userProperties = mapper(user, MAP_APPLICATION_PROPERTIES_TO_DATABASE);
 
         try {
             const result = await this.model.create(userProperties);
 
             return result;
         } catch (error) {
-            if (error.statusCode >= 500) {
-                throw new FailedDependencyError('Database not response', error);
-            } else {
-                throw new InternalServerError('Error in connection to database', error);
+            if (error.name === SQL_ERRORS.SequelizeConnectionRefusedError) {
+                throw new FailedDependencyError('Database connection refused', error);
             }
 
+            if (error.name === SQL_ERRORS.SequelizeUniqueConstraintError) {
+                throw new UnprocessableEntityError('Such email already exist', error);
+            }
+
+            if (error.name === SQL_ERRORS.SequelizeValidationError) {
+                throw new UnprocessableEntityError(`Validation error: ${error.message}`, error);
+            }
         }
     }
-
 }
 
-module.exports = new UserRepository();
+module.exports = new UserRepository(sequelize.models[userModel.name]);

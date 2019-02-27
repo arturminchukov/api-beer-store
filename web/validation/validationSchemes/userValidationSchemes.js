@@ -5,33 +5,39 @@ const USER_VALIDATION_SCHEMA = {
             properties: {
                 email: {
                     type: 'string',
-                    format: 'email'
+                    format: 'email',
+                    maxLength: 64
                 },
                 password: {
                     type: 'string',
                     minLength: 6,
-                    maxLength: 30
+                    maxLength: 64
                 },
                 firstName: {
-                    type: 'string'
+                    type: 'string',
+                    maxLength: 64,
+                    removeIfEmpty: true
                 },
                 lastName: {
-                    type: 'string'
+                    type: 'string',
+                    maxLength: 64,
+                    removeIfEmpty: true
                 },
                 birthday: {
                     if: {
                         maxLength: 0,
                         minLength: 0
                     },
-                    then: {type: 'string'},
+                    then: {removeIfEmpty: true},
                     else: {
-                        type: 'string',
-                        format: 'date'
+                        type: 'integer'
                     }
                 },
                 imageUrl: {
                     type: 'string',
-                    format: 'uri'
+                    format: 'uri',
+                    maxLength: 512,
+                    removeIfEmpty: true,
                 }
             }
         }

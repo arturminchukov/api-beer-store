@@ -1,5 +1,7 @@
-const mapProperties = require('./mapProperties');
+const mapper = require('./mapper');
+const revertMap = require('./revertMap');
 
 module.exports = {
-    mapProperties
+    mapper,
+    revertMap
 };

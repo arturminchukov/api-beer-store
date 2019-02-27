@@ -1,18 +1,18 @@
-const {userService} = require('../../application').services;
+const {userService} = require('../../application/services');
 
-class BeerController {
+class UserController {
     async register(req, res, next) {
         try {
-            const userData = req.body;
+            const userModel = req.body;
 
-            await userService.register(userData);
-            res.status(204)
-                .send();
+            await userService.register(userModel);
+            res.status(204).send();
         } catch (error) {
             next(error);
         }
     }
 
+    /*TODO: write code for login route*/
     async login(req, res, next) {
         try {
             const {email, password} = req.body;
@@ -24,4 +24,4 @@ class BeerController {
     }
 }
 
-module.exports = new BeerController();
+module.exports = new UserController();
