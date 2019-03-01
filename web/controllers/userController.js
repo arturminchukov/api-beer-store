@@ -1,26 +1,22 @@
 const {userService} = require('../../application/services');
 
 class UserController {
-    async register(req, res, next) {
-        try {
-            const userModel = req.body;
+    async register(req, res) {
+        const userModel = req.body;
 
-            await userService.register(userModel);
-            res.status(204).send();
-        } catch (error) {
-            next(error);
-        }
+        await userService.register(userModel);
+        res.status(204)
+            .send();
     }
 
-    /*TODO: write code for login route*/
-    async login(req, res, next) {
-        try {
-            const {email, password} = req.body;
+    async login(req, res) {
+        const {email, password} = req.body;
 
-            console.log(email, password);
-        } catch (error) {
-            return next(error);
-        }
+        const token = await userService.authenticate(email, password);
+
+        res.status(204)
+            .set('x-Auth', token)
+            .send();
     }
 }
 

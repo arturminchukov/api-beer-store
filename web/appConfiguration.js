@@ -27,23 +27,17 @@ const errorLogMiddleware = function (error, req, res, next) {
 };
 
 const errorHandleMiddleware = function (error, req, res, next) {
-    res.status(error.statusCode);
-    let initError = null;
-
-    if (error.getInitErrorInfo) {
-        initError = error.getInitErrorInfo();
-    }
-
     const answer = {
         statusCode: error.statusCode,
-        message: error.message,
-        initError
+        message: error.message
     };
 
     if (DEBUG) {
         answer.stackTrace = error.stack;
+        answer.initError = error.initError;
     }
 
+    res.status(error.statusCode);
     res.send(answer);
 };
 

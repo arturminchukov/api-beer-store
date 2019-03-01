@@ -1,4 +1,4 @@
-const USER_VALIDATION_SCHEMA = {
+const USER_REGISTRATION_VALIDATION_SCHEMA = {
     properties: {
         body: {
             required: ['email', 'password'],
@@ -6,7 +6,8 @@ const USER_VALIDATION_SCHEMA = {
                 email: {
                     type: 'string',
                     format: 'email',
-                    maxLength: 64
+                    maxLength: 64,
+                    minLength: 4
                 },
                 password: {
                     type: 'string',
@@ -16,28 +17,42 @@ const USER_VALIDATION_SCHEMA = {
                 firstName: {
                     type: 'string',
                     maxLength: 64,
-                    removeIfEmpty: true
+                    minLength: 1
                 },
                 lastName: {
                     type: 'string',
                     maxLength: 64,
-                    removeIfEmpty: true
+                    minLength: 1
                 },
                 birthday: {
-                    if: {
-                        maxLength: 0,
-                        minLength: 0
-                    },
-                    then: {removeIfEmpty: true},
-                    else: {
-                        type: 'integer'
-                    }
+                    type: 'integer'
                 },
                 imageUrl: {
                     type: 'string',
                     format: 'uri',
                     maxLength: 512,
-                    removeIfEmpty: true,
+                    minLength: 6
+                }
+            }
+        }
+    }
+};
+
+const USER_AUTHENTICATION_VALIDATION_SCHEMA = {
+    properties: {
+        body: {
+            required: ['email', 'password'],
+            properties: {
+                email: {
+                    type: 'string',
+                    format: 'email',
+                    maxLength: 64,
+                    minLength: 4
+                },
+                password: {
+                    type: 'string',
+                    minLength: 6,
+                    maxLength: 64
                 }
             }
         }
@@ -45,5 +60,6 @@ const USER_VALIDATION_SCHEMA = {
 };
 
 module.exports = {
-    USER_VALIDATION_SCHEMA
+    USER_REGISTRATION_VALIDATION_SCHEMA,
+    USER_AUTHENTICATION_VALIDATION_SCHEMA
 };

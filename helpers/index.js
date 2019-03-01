@@ -1,7 +1,13 @@
 const mapper = require('./mapper');
 const revertMap = require('./revertMap');
+const createHash = require('./createHash');
+const asyncJwt = require('./asyncJwt');
+const removeProperties = require('./removeProperties');
 
 module.exports = {
     mapper,
-    revertMap
+    revertMap,
+    createHash,
+    removeProperties,
+    asyncJwt
 };

@@ -16,6 +16,7 @@ const MAP_PAGE_PARAMS = {
 };
 
 const MAP_APPLICATION_PROPERTIES_TO_DATABASE = {
+    id: 'id',
     email: 'email',
     password: 'password',
     firstName: 'first_name',
