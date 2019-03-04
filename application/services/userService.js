@@ -1,4 +1,3 @@
-const {UnprocessableEntityError} = require('../../errors');
 const {userRepository} = require('../../dataAccess/repositories');
 const {createHash} = require('../../helpers');
 
@@ -16,20 +15,10 @@ class UserService {
         return user;
     }
 
-    async getUserByEmail(email) {
-        try {
-            const user = await userRepository.getUser({
-                email
-            });
-
-            return user;
-        } catch (error) {
-            if (error.statusCode === 404) {
-                throw new UnprocessableEntityError('Incorrect email');
-            }
-
-            throw error;
-        }
+    getUserByEmail(email) {
+        return userRepository.getUser({
+            email
+        });
     }
 
     _generateSalt(password) {

@@ -15,5 +15,6 @@ module.exports = {
         DEFAULT_LEVEL: 'info',
         MAX_TIME_FILES_STORE: '1d'
     },
-    DEBUG: true
+    DEBUG: true,
+    TOKEN_LIFE_TIME: '1m'
 };

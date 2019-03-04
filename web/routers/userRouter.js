@@ -10,7 +10,7 @@ const {userAuthenticationSchema, userRegistrationSchema} = validationSchemes;
 const middlewareRegistrationValidator = validationMiddlewareFactory(userRegistrationSchema);
 const middlewareAuthenticationValidator = validationMiddlewareFactory(userAuthenticationSchema);
 
-router.post('/addUser', middlewareRegistrationValidator, routerWrapper(userController.addUser));
+router.post('/register', middlewareRegistrationValidator, routerWrapper(userController.register));
 router.post('/login', middlewareAuthenticationValidator, routerWrapper(userController.login));
 
 module.exports = router;

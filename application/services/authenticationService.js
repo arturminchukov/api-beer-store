@@ -1,28 +1,36 @@
 const config = require('config');
 
 const {createHash, asyncJwt} = require('../../helpers');
-const {UnprocessableEntityError, InternalServerError} = require('../../errors');
+const {UnprocessableEntityError, NotFoundError} = require('../../errors');
+const userService = require('./userService');
 
 const SECRET_TOKEN_KEY = config.get('SECRET_TOKEN_KEY');
+const TOKEN_LIFE_TIME = config.get('TOKEN_LIFE_TIME');
 
 class AuthenticationService {
-    async authenticate(passwordToCheck, user) {
-        const passwordHash = createHash(passwordToCheck + user.salt);
+    async authenticateByCredentials(email, password) {
+        let user = null;
+
+        try {
+            user = await userService.getUserByEmail(email);
+        } catch (error) {
+            if (error instanceof NotFoundError) {
+                throw new UnprocessableEntityError('Incorrect email');
+            }
+
+            throw error;
+        }
+
+        const passwordHash = createHash(password + user.salt);
 
         if (passwordHash !== user.password) {
             throw new UnprocessableEntityError('Incorrect password');
         }
 
-        try {
-            const token = await asyncJwt.createToken({
-                userId: user.id,
-                email: user.email
-            }, SECRET_TOKEN_KEY, '1m');
-
-            return token;
-        } catch (error) {
-            throw new InternalServerError('Cannot create a token', error);
-        }
+        return asyncJwt.createToken({
+            userId: user.id,
+            email: user.email
+        }, SECRET_TOKEN_KEY, TOKEN_LIFE_TIME);
     }
 }
 

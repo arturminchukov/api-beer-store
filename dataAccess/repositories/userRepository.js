@@ -11,12 +11,12 @@ class UserRepository {
     }
 
     async getUser(searchCriteria) {
-        const validOptions = mapper(searchCriteria, MAP_APPLICATION_PROPERTIES_TO_DATABASE);
+        const mappedSearchCriteria = mapper(searchCriteria, MAP_APPLICATION_PROPERTIES_TO_DATABASE);
         let user = null;
 
         try {
             user = await this.model.findOne({
-                where: validOptions,
+                where: mappedSearchCriteria,
                 raw: true
             });
         } catch (error) {
