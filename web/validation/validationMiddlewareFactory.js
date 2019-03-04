@@ -3,7 +3,7 @@ const {UnprocessableEntityError} = require('../../errors');
 
 const validationMiddlewareFactory = function (validationSchema, options) {
     const defaultOptions = {
-        // coerceTypes: true,
+        coerceTypes: true,
         allErrors: true,
         removeAdditional: true,
         useDefaults: true

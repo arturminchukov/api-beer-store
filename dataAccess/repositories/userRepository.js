@@ -12,10 +12,10 @@ class UserRepository {
 
     async getUser(searchCriteria) {
         const validOptions = mapper(searchCriteria, MAP_APPLICATION_PROPERTIES_TO_DATABASE);
-        let result = null;
+        let user = null;
 
         try {
-            result = await this.model.findOne({
+            user = await this.model.findOne({
                 where: validOptions,
                 raw: true
             });
@@ -29,22 +29,22 @@ class UserRepository {
             }
         }
 
-        if (!result) {
+        if (!user) {
             throw new NotFoundError('The user was not found');
         }
 
-        result = mapper(result, MAP_DATABASE_PROPERTIES_TO_APPLICATION);
+        user = mapper(user, MAP_DATABASE_PROPERTIES_TO_APPLICATION);
 
-        return result;
+        return user;
     }
 
     async createUser(user) {
         const userProperties = mapper(user, MAP_APPLICATION_PROPERTIES_TO_DATABASE);
 
         try {
-            const result = await this.model.create(userProperties);
+            const createdUser = await this.model.create(userProperties);
 
-            return result;
+            return createdUser;
         } catch (error) {
             if (error.name === SQL_ERRORS.SequelizeConnectionRefusedError) {
                 throw new FailedDependencyError('Database connection refused', error);

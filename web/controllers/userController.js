@@ -1,22 +1,23 @@
-const {userService} = require('../../application/services');
+const {userService, authenticationService} = require('../../application/services');
 
 class UserController {
-    async register(req, res) {
+    async addUser(req, res) {
         const userModel = req.body;
 
-        await userService.register(userModel);
+        await userService.addUser(userModel);
         res.status(204)
-            .send();
+            .end();
     }
 
     async login(req, res) {
         const {email, password} = req.body;
 
-        const token = await userService.authenticate(email, password);
+        const user = await userService.getUserByEmail(email);
+        const token = await authenticationService.authenticate(password, user);
 
         res.status(204)
             .set('x-Auth', token)
-            .send();
+            .end();
     }
 }
 

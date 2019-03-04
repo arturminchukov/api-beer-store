@@ -1,55 +1,34 @@
-const config = require('config');
-
-const {UnprocessableEntityError, InternalServerError} = require('../../errors');
+const {UnprocessableEntityError} = require('../../errors');
 const {userRepository} = require('../../dataAccess/repositories');
-const {createHash, asyncJwt} = require('../../helpers');
-
-const SECRET_TOKEN_KEY = config.get('SECRET_TOKEN_KEY');
+const {createHash} = require('../../helpers');
 
 class UserService {
-    async register(userModel) {
+    async addUser(userModel) {
         const salt = this._generateSalt(userModel.password);
         const passwordHash = createHash(userModel.password + salt);
 
-        const result = await userRepository.createUser({
+        const user = await userRepository.createUser({
             ...userModel,
             password: passwordHash,
             salt
         });
 
-        return result;
+        return user;
     }
 
-    async authenticate(email, password) {
-        let user = null;
-
+    async getUserByEmail(email) {
         try {
-            user = await userRepository.getUser({
+            const user = await userRepository.getUser({
                 email
             });
+
+            return user;
         } catch (error) {
             if (error.statusCode === 404) {
                 throw new UnprocessableEntityError('Incorrect email');
             }
 
             throw error;
-        }
-
-        const passwordHash = createHash(password + user.salt);
-
-        if (passwordHash !== user.password) {
-            throw new UnprocessableEntityError('Incorrect password');
-        }
-
-        try {
-            const token = await asyncJwt.createToken({
-                userId: user.id,
-                email
-            }, SECRET_TOKEN_KEY);
-
-            return token;
-        } catch (error) {
-            throw new InternalServerError('Cannot create a token');
         }
     }
 

@@ -1,4 +1,4 @@
-const USER_REGISTRATION_VALIDATION_SCHEMA = {
+module.exports = {
     properties: {
         body: {
             required: ['email', 'password'],
@@ -36,30 +36,4 @@ const USER_REGISTRATION_VALIDATION_SCHEMA = {
             }
         }
     }
-};
-
-const USER_AUTHENTICATION_VALIDATION_SCHEMA = {
-    properties: {
-        body: {
-            required: ['email', 'password'],
-            properties: {
-                email: {
-                    type: 'string',
-                    format: 'email',
-                    maxLength: 64,
-                    minLength: 4
-                },
-                password: {
-                    type: 'string',
-                    minLength: 6,
-                    maxLength: 64
-                }
-            }
-        }
-    }
-};
-
-module.exports = {
-    USER_REGISTRATION_VALIDATION_SCHEMA,
-    USER_AUTHENTICATION_VALIDATION_SCHEMA
 };
