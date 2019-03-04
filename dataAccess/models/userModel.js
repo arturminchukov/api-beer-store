@@ -37,11 +37,21 @@ const userModel = {
         salt: {
             type: Sequelize.STRING(128),
             allowNull: false
+        },
+        created_at: {
+            type: Sequelize.DATE,
+            allowNull: false,
+            defaultValue: Sequelize.NOW
+        },
+        updated_at: {
+            type: Sequelize.DATE,
+            allowNull: false,
+            defaultValue: Sequelize.NOW
         }
     },
     options: {
         underscored: true,
-        timestamps: false,
+        timestamps: true,
         tableName: 'users'
     }
 };
