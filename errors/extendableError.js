@@ -7,22 +7,6 @@ class ExtendableError extends Error {
 
         Error.captureStackTrace(this, this.constructor);
     }
-
-    getInitErrorInfo() {
-        if (!this.initError) {
-            return null;
-        }
-
-        if (this.initError instanceof Array) {
-            return this.initError.map(error => `${error.keyword} ${error.dataPath} ${error.message}`);
-        }
-
-        return {
-            statusCode: this.initError.statusCode,
-            message: this.initError.message,
-            stack: this.initError.stack
-        };
-    }
 }
 
 module.exports = ExtendableError;

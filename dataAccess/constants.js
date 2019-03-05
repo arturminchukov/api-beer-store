@@ -1,19 +1,9 @@
-const MAP_FILTER_PARAMS = {
-    beerName: 'beer_name',
-    alcoholByVolumeGreat: 'abv_gt',
-    alcoholByVolumeLess: 'abv_lt',
-    internationalBitternessUnitsGreat: 'ibu_gt',
-    internationalBitternessUnitsLess: 'ibu_lt',
-    colorEbcGreat: 'ebc_gt',
-    colorEbcLess: 'ebc_lt'
-};
-
-const MAP_PAGE_PARAMS = {
-    pageNumber: 'page',
-    pageSize: 'per_page'
+const SQL_ERRORS = {
+    SequelizeConnectionRefusedError: 'SequelizeConnectionRefusedError',
+    SequelizeUniqueConstraintError: 'SequelizeUniqueConstraintError',
+    SequelizeValidationError: 'SequelizeValidationError'
 };
 
 module.exports = {
-    MAP_FILTER_PARAMS,
-    MAP_PAGE_PARAMS
+    SQL_ERRORS
 };

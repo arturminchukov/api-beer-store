@@ -1,5 +1,11 @@
-const beerValidationSchemes = require('./beerValidationSchemes');
+const beersValidationSchema = require('./beersValidationSchema');
+const beerValidationSchema = require('./beerValidationSchema');
+const userAuthenticationSchema = require('./userLoginSchema');
+const userRegistrationSchema = require('./userRegistrationSchema');
 
 module.exports = {
-    beerValidationSchemes
+    beersValidationSchema,
+    beerValidationSchema,
+    userAuthenticationSchema,
+    userRegistrationSchema
 };

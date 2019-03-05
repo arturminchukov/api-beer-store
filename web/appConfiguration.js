@@ -3,7 +3,7 @@ const config = require('config');
 require('winston-daily-rotate-file');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const {beersRouter} = require('./routers');
+const {beerRouter, userRouter} = require('./routers');
 const {logger} = require('../modules');
 const morgan = require('morgan');
 
@@ -14,7 +14,7 @@ const errorLogMiddleware = function (error, req, res, next) {
         statusCode: error.statusCode,
         message: error.message,
         stackTrace: error.stack,
-        initError: error.getInitErrorInfo(),
+        initError: error.initError,
         request: {
             query: req.query || null,
             params: req.params || null,
@@ -27,20 +27,18 @@ const errorLogMiddleware = function (error, req, res, next) {
 };
 
 const errorHandleMiddleware = function (error, req, res, next) {
-    res.status(error.statusCode);
+    const answer = {
+        statusCode: error.statusCode,
+        message: error.message
+    };
+
     if (DEBUG) {
-        res.send({
-            statusCode: error.statusCode,
-            message: error.message,
-            stackTrace: error.stack,
-            initError: error.getInitErrorInfo()
-        });
-    } else {
-        res.send({
-            message: error.message,
-            statusCode: error.statusCode
-        });
+        answer.stackTrace = error.stack;
+        answer.initError = error.initError;
     }
+
+    res.status(error.statusCode);
+    res.send(answer);
 };
 
 const configureParsers = function (app) {
@@ -57,7 +55,8 @@ const configureLogger = function (app) {
 };
 
 const configureRoutes = function (app) {
-    app.use('/beers', beersRouter);
+    app.use('/beers', beerRouter);
+    app.use('/users', userRouter);
 };
 
 const configureErrorLogger = function (app) {

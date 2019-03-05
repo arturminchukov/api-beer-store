@@ -14,6 +14,7 @@ const validationMiddlewareFactory = function (validationSchema, options) {
             ...defaultOptions,
             ...options
         });
+
         const valid = ajv.validate(validationSchema, req);
 
         if (!valid) {

@@ -12,5 +12,7 @@ module.exports = {
     EXTERNAL_RESOURCES: {
         API_URL: 'EXTERNAL_API_URL'
     },
-    DEBUG: 'DEBUG'
+    DEBUG: 'DEBUG',
+    SECRET_TOKEN_KEY: 'SECRET_TOKEN_KEY',
+    TOKEN_LIFE_TIME: 'TOKEN_LIFE_TIME'
 };
