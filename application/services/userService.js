@@ -16,7 +16,7 @@ class UserService {
     }
 
     getUserByEmail(email) {
-        return userRepository.getUser({
+        return userRepository.getUserEntity({
             email
         });
     }

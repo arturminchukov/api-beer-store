@@ -1,11 +1,12 @@
 const {beerService} = require('../../application/services');
 const {FILTER_PARAMS_SCHEMA, PAGINATION_PARAMS_SCHEMA} = require('../constants');
+const {filterByParams} = require('../../helpers');
 
 class BeerController {
     async getBeers(req, res) {
         const {query} = req;
-        const filterParams = this._filterByParams(query, FILTER_PARAMS_SCHEMA);
-        const pageParams = this._filterByParams(query, PAGINATION_PARAMS_SCHEMA);
+        const filterParams = filterByParams(query, FILTER_PARAMS_SCHEMA);
+        const pageParams = filterByParams(query, PAGINATION_PARAMS_SCHEMA);
 
         const result = await beerService.getBeers(pageParams, filterParams);
 
@@ -20,14 +21,24 @@ class BeerController {
         res.send(result);
     }
 
-    _filterByParams(query, paramNames) {
-        return paramNames.reduce((params, key) => {
-            if (query[key]) {
-                params[key] = query[key];
-            }
+    async addFavorite(req, res) {
+        const beerId = req.params.id;
+        const {userId} = res.locals;
 
-            return params;
-        }, {});
+        await beerService.addFavorite(beerId, userId);
+
+        res.status(204)
+            .end();
+    }
+
+    async removeFavorite(req, res) {
+        const beerId = req.params.id;
+        const {userId} = res.locals;
+
+        await beerService.removeFavorite(beerId, userId);
+
+        res.status(204)
+            .end();
     }
 }
 

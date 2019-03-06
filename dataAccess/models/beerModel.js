@@ -1,20 +1,33 @@
 const Sequelize = require('sequelize');
 
 const userModel = {
-    name: 'user_favorite',
+    name: 'beer',
     attributes: {
         id: {
             type: Sequelize.INTEGER,
-            autoIncrement: true,
-            primaryKey: true
+            primaryKey: true,
+            autoIncrement: true
         },
-        user_id: {
+        foreign_id: {
             type: Sequelize.INTEGER,
+            allowNull: false,
+            unique: true
+        },
+        name: {
+            type: Sequelize.STRING(128),
             allowNull: false
         },
-        favorite_id: {
-            type: Sequelize.INTEGER,
-            allowNull: false
+        tagline: {
+            type: Sequelize.STRING(128)
+        },
+        description: {
+            type: Sequelize.TEXT
+        },
+        image_url: {
+            type: Sequelize.STRING(512),
+            validate: {
+                isUrl: true
+            }
         },
         created_at: {
             type: Sequelize.DATE,
@@ -30,7 +43,7 @@ const userModel = {
     options: {
         underscored: true,
         timestamps: true,
-        tableName: 'user_favorites'
+        tableName: 'beers'
     }
 };
 

@@ -12,6 +12,18 @@ class AsyncJwt {
             });
         });
     }
+
+    verifyToken(token, secretKey) {
+        return new Promise((resolve, reject) => {
+            jwt.verify(token, secretKey, (error, decoded) => {
+                if (error) {
+                    reject(error);
+                }
+
+                resolve(decoded);
+            });
+        });
+    }
 }
 
 module.exports = new AsyncJwt();

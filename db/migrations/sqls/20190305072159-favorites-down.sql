@@ -1,2 +1,2 @@
-DROP TABLE user_favorites;
-DROP TABLE favorites;
+DROP TABLE user_beers;
+DROP TABLE beers;

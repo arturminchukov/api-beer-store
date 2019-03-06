@@ -1,7 +1,7 @@
 const config = require('config');
 
 const {createHash, asyncJwt} = require('../../helpers');
-const {UnprocessableEntityError, NotFoundError} = require('../../errors');
+const {UnprocessableEntityError, NotFoundError, UnauthorizedError} = require('../../errors');
 const userService = require('./userService');
 
 const SECRET_TOKEN_KEY = config.get('SECRET_TOKEN_KEY');
@@ -31,6 +31,28 @@ class AuthenticationService {
             userId: user.id,
             email: user.email
         }, SECRET_TOKEN_KEY, TOKEN_LIFE_TIME);
+    }
+
+    async authenticateByToken(token) {
+        let decodedData = null;
+
+        try {
+            decodedData = await asyncJwt.verifyToken(token, SECRET_TOKEN_KEY);
+        } catch (error) {
+            throw new UnauthorizedError('Invalid token', error);
+        }
+
+        const {email, userId} = decodedData;
+
+        const updatedToken = asyncJwt.createToken({
+            userId,
+            email
+        }, SECRET_TOKEN_KEY, TOKEN_LIFE_TIME);
+
+        return {
+            updatedToken,
+            userId
+        };
     }
 }
 

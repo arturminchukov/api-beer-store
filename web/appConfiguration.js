@@ -1,45 +1,11 @@
-const config = require('config');
-
 require('winston-daily-rotate-file');
-const bodyParser = require('body-parser');
 const cors = require('cors');
-const {beerRouter, userRouter} = require('./routers');
-const {logger} = require('../modules');
+const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
-const DEBUG = config.get('DEBUG');
-
-const errorLogMiddleware = function (error, req, res, next) {
-    logger.error({
-        statusCode: error.statusCode,
-        message: error.message,
-        stackTrace: error.stack,
-        initError: error.initError,
-        request: {
-            query: req.query || null,
-            params: req.params || null,
-            path: req.path,
-            method: req.method,
-            originalUrl: req.originalUrl
-        }
-    });
-    next(error);
-};
-
-const errorHandleMiddleware = function (error, req, res, next) {
-    const answer = {
-        statusCode: error.statusCode,
-        message: error.message
-    };
-
-    if (DEBUG) {
-        answer.stackTrace = error.stack;
-        answer.initError = error.initError;
-    }
-
-    res.status(error.statusCode);
-    res.send(answer);
-};
+const {beerRouter, userRouter} = require('./routers');
+const {logger} = require('../modules');
+const {errorHandleMiddleware, errorLogMiddleware} = require('./middlewares');
 
 const configureParsers = function (app) {
     app.use(bodyParser.urlencoded({extended: false}));

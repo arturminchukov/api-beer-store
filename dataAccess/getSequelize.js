@@ -1,6 +1,6 @@
 const GetSequelize = require('sequelize');
 const config = require('config');
-const {userModel, favoriteModel, userFavoritesModel} = require('./models');
+const {userModel, beerModel, userBeerModel} = require('./models');
 
 const DATABASE = config.get('DB.NAME');
 const USERNAME = config.get('DB.USERNAME');
@@ -8,7 +8,7 @@ const PASSWORD = config.get('DB.PASSWORD');
 const PORT = config.get('DB.PORT');
 const HOST = config.get('DB.HOST');
 
-const models = [userModel, favoriteModel, userFavoritesModel];
+const models = [userModel, beerModel, userBeerModel];
 
 const getSequelize = function (modelList) {
     const sequelize = new GetSequelize(DATABASE, USERNAME, PASSWORD, {
@@ -22,8 +22,8 @@ const getSequelize = function (modelList) {
     });
 
     const User = sequelize.models[userModel.name];
-    const Favorites = sequelize.models[favoriteModel.name];
-    const UserFavorites = sequelize.models[userFavoritesModel.name];
+    const Favorites = sequelize.models[beerModel.name];
+    const UserFavorites = sequelize.models[userBeerModel.name];
 
     User.belongsToMany(Favorites, {
         through: {
@@ -39,7 +39,7 @@ const getSequelize = function (modelList) {
             model: UserFavorites,
             unique: false
         },
-        foreignKey: 'favorite_id',
+        foreignKey: 'beer_id',
         constraints: false
     });
 
