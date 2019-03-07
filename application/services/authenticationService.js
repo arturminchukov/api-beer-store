@@ -44,7 +44,7 @@ class AuthenticationService {
 
         const {email, userId} = decodedData;
 
-        const updatedToken = asyncJwt.createToken({
+        const updatedToken = await asyncJwt.createToken({
             userId,
             email
         }, SECRET_TOKEN_KEY, TOKEN_LIFE_TIME);
