@@ -3,11 +3,14 @@ const {userModel} = require('../models');
 const {mapper} = require('../../helpers');
 const {SQL_ERRORS} = require('../constants');
 const {MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION} = require('../mappers');
-const {FailedDependencyError, NotFoundError, UnprocessableEntityError} = require('../../errors');
+const {NotFoundError, UnprocessableEntityError} = require('../../errors');
+const BaseRepository = require('./baseRepository');
 
-class UserRepository {
+class UserRepository extends BaseRepository {
     constructor(sequelizeInstance) {
-        this.model = sequelizeInstance.models[userModel.name];
+        super(sequelizeInstance.models[userModel.name]);
+
+        this.beerAccessors = this.model.associations.beers.accessors;
     }
 
     async getUserEntity(searchCriteria) {
@@ -16,23 +19,13 @@ class UserRepository {
         return mapper(user.dataValues, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION);
     }
 
-    async getUser(searchCriteria) {
+    async getUser(searchCriteria, transaction) {
         const mappedSearchCriteria = mapper(searchCriteria, MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE);
-        let user = null;
+        const user = await this._sequelizeErrorHandler(this.model.findOne, this.model, {
+            where: mappedSearchCriteria,
+            transaction
+        });
 
-        try {
-            user = await this.model.findOne({
-                where: mappedSearchCriteria
-            });
-        } catch (error) {
-            if (error.name === SQL_ERRORS.SequelizeConnectionRefusedError) {
-                throw new FailedDependencyError('Database connection refused', error);
-            }
-
-            if (error.name === SQL_ERRORS.SequelizeValidationError) {
-                throw new UnprocessableEntityError(`Validation error: ${error.message}`, error);
-            }
-        }
 
         if (!user) {
             throw new NotFoundError('The user was not found');
@@ -45,52 +38,30 @@ class UserRepository {
         const userProperties = mapper(user, MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE);
 
         try {
-            const createdUser = await this.model.create(userProperties);
+            const createdUser = await this._sequelizeErrorHandler(this.model.create, this.model, userProperties);
 
             return createdUser;
         } catch (error) {
-            if (error.name === SQL_ERRORS.SequelizeConnectionRefusedError) {
-                throw new FailedDependencyError('Database connection refused', error);
-            }
-
             if (error.name === SQL_ERRORS.SequelizeUniqueConstraintError) {
                 throw new UnprocessableEntityError('Such email already exist', error);
             }
 
-            if (error.name === SQL_ERRORS.SequelizeValidationError) {
-                throw new UnprocessableEntityError(`Validation error: ${error.message}`, error);
-            }
-
             throw error;
         }
     }
 
-    addFavorite(userId, favoriteBeer) {
-        return this._favoriteOperation(userId, favoriteBeer, 'addBeer');
+    addFavoriteBeer(userId, favoriteBeer, transaction) {
+        return this._favoriteBeerOperation(userId, favoriteBeer, this.beerAccessors.add, transaction);
     }
 
-    removeFavorite(userId, favoriteBeer) {
-        return this._favoriteOperation(userId, favoriteBeer, 'removeBeer');
+    removeFavoriteBeer(userId, favoriteBeer, transaction) {
+        return this._favoriteBeerOperation(userId, favoriteBeer, this.beerAccessors.remove, transaction);
     }
 
-    async _favoriteOperation(userId, favoriteBeer, operation) {
-        const user = await this.getUser({id: userId});
+    async _favoriteBeerOperation(userId, favoriteBeer, operation, transaction) {
+        const user = await this.getUser({id: userId}, transaction);
 
-        try {
-            const favorite = await user[operation](favoriteBeer);
-
-            return favorite;
-        } catch (error) {
-            if (error.name === SQL_ERRORS.SequelizeConnectionRefusedError) {
-                throw new FailedDependencyError('Database connection refused', error);
-            }
-
-            if (error.name === SQL_ERRORS.SequelizeValidationError) {
-                throw new UnprocessableEntityError(`Validation error: ${error.message}`, error);
-            }
-
-            throw error;
-        }
+        return this._sequelizeErrorHandler(user[operation], user, favoriteBeer, {transaction});
     }
 }
 

@@ -13,7 +13,7 @@ class UserController {
     async login(req, res) {
         const {email, password} = req.body;
 
-        const token = await authenticationService.authenticateByCredentials(email, password);
+        const {token} = await authenticationService.authenticateByCredentials(email, password);
 
         res.status(204)
             .set(AUTH_HEADER, token)

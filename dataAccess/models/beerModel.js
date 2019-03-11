@@ -8,7 +8,7 @@ const userModel = {
             primaryKey: true,
             autoIncrement: true
         },
-        foreign_id: {
+        external_id: {
             type: Sequelize.INTEGER,
             allowNull: false,
             unique: true

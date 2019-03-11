@@ -1,6 +1,6 @@
-const {beerRepository, favoriteRepository, userRepository} = require('../../dataAccess/repositories');
-const {UnprocessableEntityError} = require('../../errors');
-const {filterByParams} = require('../../helpers');
+const {beerRepository, userRepository} = require('../../dataAccess/repositories');
+const sequelize = require('../../dataAccess/getSequelize');
+const {mapper} = require('../../helpers');
 const {BEER_PREVIEW_INFO} = require('../constants');
 
 class BeerService {
@@ -18,29 +18,23 @@ class BeerService {
         return beerRepository.get(beerId);
     }
 
-    async addFavorite(beerId, userId) {
+    async addFavoriteBeer(beerId, userId) {
         const beer = await this.getBeer(beerId);
-        const beerPreviewInfo = filterByParams(beer, BEER_PREVIEW_INFO);
+        const beerPreviewInfo = mapper(beer, BEER_PREVIEW_INFO);
 
-        let favoriteBeer = null;
+        return sequelize.transaction(async (t) => {
+            const favoriteBeer = await beerRepository.addBeer(beerPreviewInfo, t);
 
-        try {
-            favoriteBeer = await favoriteRepository.addFavorite(beerPreviewInfo);
-        } catch (error) {
-            if (!(error instanceof UnprocessableEntityError) && error.message !== 'Such favorite id already exist') {
-                throw error;
-            }
-
-            favoriteBeer = await favoriteRepository.getFavoriteByForeignId(beerId);
-        }
-
-        return userRepository.addFavorite(userId, favoriteBeer);
+            return userRepository.addFavoriteBeer(userId, favoriteBeer, t);
+        });
     }
 
-    async removeFavorite(beerId, userId) {
-        const favoriteBeer = await favoriteRepository.getFavoriteByForeignId(beerId);
+    removeFavorite(beerId, userId) {
+        return sequelize.transaction(async (t) => {
+            const favoriteBeer = await beerRepository.getBeerByExternalId(beerId, t);
 
-        return userRepository.removeFavorite(userId, favoriteBeer);
+            return userRepository.removeFavoriteBeer(userId, favoriteBeer, t);
+        });
     }
 }
 

@@ -18,7 +18,7 @@ const getSequelize = function (modelList) {
     });
 
     modelList.forEach((model) => {
-        sequelize.models[model.name] = sequelize.define(model.name, model.attributes, model.options);
+        sequelize.define(model.name, model.attributes, model.options);
     });
 
     const User = sequelize.models[userModel.name];

@@ -9,7 +9,10 @@ const errorHandleMiddleware = function (error, req, res, next) {
     };
 
     if (DEBUG) {
-        answer.stackTrace = error.stack;
+        if (error.statusCode >= 500) {
+            answer.stackTrace = error.stack;
+        }
+
         answer.initError = error.initError;
     }
 

@@ -1,6 +1,6 @@
 CREATE TABLE beers (
     id SERIAL PRIMARY KEY,
-    foreign_id INTEGER UNIQUE NOT NULL,
+    external_id INTEGER UNIQUE NOT NULL,
     name VARCHAR(128) NOT NULL,
     tagline VARCHAR(128),
     description TEXT,

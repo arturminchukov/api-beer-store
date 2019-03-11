@@ -1,4 +1,4 @@
-const BEERS_VALIDATION_SCHEMA = {
+module.exports = {
     properties: {
         query: {
             additionalProperties: false,
@@ -31,26 +31,11 @@ const BEERS_VALIDATION_SCHEMA = {
                 },
                 colorEbcLess: {
                     type: 'integer'
+                },
+                isFavorite: {
+                    type: 'boolean'
                 }
             }
         }
     }
-};
-
-const BEER_VALIDATION_SCHEMA = {
-    properties: {
-        params: {
-            properties: {
-                id: {
-                    type: 'integer',
-                    minimum: 1
-                }
-            }
-        }
-    }
-};
-
-module.exports = {
-    BEER_VALIDATION_SCHEMA,
-    BEERS_VALIDATION_SCHEMA
 };

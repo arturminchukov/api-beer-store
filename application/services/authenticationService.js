@@ -27,30 +27,35 @@ class AuthenticationService {
             throw new UnprocessableEntityError('Incorrect password');
         }
 
-        return asyncJwt.createToken({
+        const token = await asyncJwt.createToken({
             userId: user.id,
             email: user.email
         }, SECRET_TOKEN_KEY, TOKEN_LIFE_TIME);
+
+        return {
+            token,
+            userId: user.id
+        };
     }
 
-    async authenticateByToken(token) {
+    async authenticateByToken(tokenToCheck) {
         let decodedData = null;
 
         try {
-            decodedData = await asyncJwt.verifyToken(token, SECRET_TOKEN_KEY);
+            decodedData = await asyncJwt.verifyToken(tokenToCheck, SECRET_TOKEN_KEY);
         } catch (error) {
             throw new UnauthorizedError('Invalid token', error);
         }
 
         const {email, userId} = decodedData;
 
-        const updatedToken = await asyncJwt.createToken({
+        const token = await asyncJwt.createToken({
             userId,
             email
         }, SECRET_TOKEN_KEY, TOKEN_LIFE_TIME);
 
         return {
-            updatedToken,
+            token,
             userId
         };
     }
