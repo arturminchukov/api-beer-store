@@ -22,18 +22,18 @@ class BeerService {
         const beer = await this.getBeer(beerId);
         const beerPreviewInfo = mapper(beer, BEER_PREVIEW_INFO);
 
-        return sequelize.transaction(async (t) => {
-            const favoriteBeer = await beerRepository.addBeer(beerPreviewInfo, t);
+        return sequelize.transaction(async (transaction) => {
+            const favoriteBeer = await beerRepository.addBeer(beerPreviewInfo, transaction);
 
-            return userRepository.addFavoriteBeer(userId, favoriteBeer, t);
+            return userRepository.addFavoriteBeer(userId, favoriteBeer, transaction);
         });
     }
 
     removeFavorite(beerId, userId) {
-        return sequelize.transaction(async (t) => {
-            const favoriteBeer = await beerRepository.getBeerByExternalId(beerId, t);
+        return sequelize.transaction(async (transaction) => {
+            const favoriteBeer = await beerRepository.getBeerByExternalId(beerId, transaction);
 
-            return userRepository.removeFavoriteBeer(userId, favoriteBeer, t);
+            return userRepository.removeFavoriteBeer(userId, favoriteBeer, transaction);
         });
     }
 }
