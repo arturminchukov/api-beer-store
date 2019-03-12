@@ -1,7 +1,7 @@
 const config = require('config');
 
 const {createHash, asyncJwt} = require('../../helpers');
-const {UnprocessableEntityError, NotFoundError} = require('../../errors');
+const {UnprocessableEntityError, NotFoundError, UnauthorizedError} = require('../../errors');
 const userService = require('./userService');
 
 const SECRET_TOKEN_KEY = config.get('SECRET_TOKEN_KEY');
@@ -27,10 +27,37 @@ class AuthenticationService {
             throw new UnprocessableEntityError('Incorrect password');
         }
 
-        return asyncJwt.createToken({
+        const token = await asyncJwt.createToken({
             userId: user.id,
             email: user.email
         }, SECRET_TOKEN_KEY, TOKEN_LIFE_TIME);
+
+        return {
+            token,
+            userId: user.id
+        };
+    }
+
+    async authenticateByToken(tokenToCheck) {
+        let decodedData = null;
+
+        try {
+            decodedData = await asyncJwt.verifyToken(tokenToCheck, SECRET_TOKEN_KEY);
+        } catch (error) {
+            throw new UnauthorizedError('Invalid token', error);
+        }
+
+        const {email, userId} = decodedData;
+
+        const token = await asyncJwt.createToken({
+            userId,
+            email
+        }, SECRET_TOKEN_KEY, TOKEN_LIFE_TIME);
+
+        return {
+            token,
+            userId
+        };
     }
 }
 

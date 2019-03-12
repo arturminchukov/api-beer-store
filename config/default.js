@@ -16,5 +16,5 @@ module.exports = {
         MAX_TIME_FILES_STORE: '1d'
     },
     DEBUG: true,
-    TOKEN_LIFE_TIME: '1m'
+    TOKEN_LIFE_TIME: '1h'
 };

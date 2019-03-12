@@ -1,4 +1,5 @@
 const {userService, authenticationService} = require('../../application/services');
+const {AUTH_HEADER} = require('../constants');
 
 class UserController {
     async register(req, res) {
@@ -12,10 +13,10 @@ class UserController {
     async login(req, res) {
         const {email, password} = req.body;
 
-        const token = await authenticationService.authenticateByCredentials(email, password);
+        const {token} = await authenticationService.authenticateByCredentials(email, password);
 
         res.status(204)
-            .set('x-Auth', token)
+            .set(AUTH_HEADER, token)
             .end();
     }
 }

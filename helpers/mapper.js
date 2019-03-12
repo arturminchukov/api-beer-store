@@ -4,10 +4,23 @@ const mapper = function (properties, map) {
     }
 
     const newProperties = {};
-    const propertiesKeys = Object.keys(properties);
+    const mapIsArray = map instanceof Array;
+    let mapKeys = null;
 
-    propertiesKeys.forEach((paramKey) => {
-        newProperties[map[paramKey]] = properties[paramKey];
+    if (mapIsArray) {
+        mapKeys = map;
+    } else {
+        mapKeys = Object.keys(map);
+    }
+
+    mapKeys.forEach((mapKey) => {
+        if (properties[mapKey]) {
+            if (mapIsArray) {
+                newProperties[mapKey] = properties[mapKey];
+            } else {
+                newProperties[map[mapKey]] = properties[mapKey];
+            }
+        }
     });
 
     return newProperties;

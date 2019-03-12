@@ -18,7 +18,7 @@ const validationMiddlewareFactory = function (validationSchema, options) {
         const valid = ajv.validate(validationSchema, req);
 
         if (!valid) {
-            next(new UnprocessableEntityError('Invalid parameters', ajv.errors));
+            return next(new UnprocessableEntityError('Invalid parameters', ajv.errors));
         }
 
         next();
