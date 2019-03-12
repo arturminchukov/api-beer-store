@@ -18,6 +18,28 @@ class BeerService extends BaseService {
         return beerRepository.get(beerId);
     }
 
+    async getFavoriteBeers(userId, paginationParams) {
+        const {items, count} = await userRepository.getFavorites(userId, paginationParams);
+        const next = this._getNext(paginationParams.pageNumber, paginationParams.pageSize, count);
+
+        return {
+            items,
+            count,
+            next
+        };
+    }
+
+    _getNext(currentPage, pageSize, count) {
+        if (currentPage * pageSize < count) {
+            return {
+                pageSize,
+                pageNumber: currentPage + 1
+            };
+        }
+
+        return null;
+    }
+
     async addFavoriteBeer(beerId, userId) {
         const beer = await this.getBeer(beerId);
         const beerPreviewInfo = mapper(beer, BEER_PREVIEW_INFO);

@@ -59,6 +59,21 @@ class UserRepository extends BaseRepository {
         }
     }
 
+    async getFavorites(userId, paginationParams) {
+        const databasePaginationParams = {
+            limit: paginationParams.pageSize,
+            offset: (paginationParams.pageNumber - 1) * paginationParams.pageSize
+        };
+
+        const beers = await this._favoriteBeerOperation(userId, this.beerAccessors.get, databasePaginationParams);
+        const beerCount = await this._favoriteBeerOperation(userId, this.beerAccessors.count);
+
+        return {
+            items: beers,
+            count: beerCount
+        };
+    }
+
     async addFavoriteBeer(userId, favoriteBeer, transaction) {
         const addedFavoriteBeer = await this._favoriteBeerOperation(userId, this.beerAccessors.add, favoriteBeer, transaction);
 

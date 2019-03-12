@@ -8,6 +8,12 @@ class BeerController {
         const filterParams = mapper(query, FILTER_PARAMS_SCHEMA);
         const pageParams = mapper(query, PAGINATION_PARAMS_SCHEMA);
 
+        if (query.isFavorite) {
+            const paginatedFavoriteBeers = await beerService.getFavoriteBeers(res.locals.userId, pageParams);
+
+            return res.send(paginatedFavoriteBeers);
+        }
+
         const result = await beerService.getBeers(pageParams, filterParams);
 
         res.send(result);
