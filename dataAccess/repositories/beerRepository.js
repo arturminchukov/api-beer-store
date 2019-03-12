@@ -42,13 +42,21 @@ class BeerRepository extends BaseRepository {
         return beers[0];
     }
 
-    async getBeerByExternalId(beerId, transaction) {
-        const beer = await this._sequelizeErrorHandler(this.model.findOne, this.model, {
-            where: {
-                external_id: beerId
-            },
-            transaction
-        });
+    async getBeerByExternalId(externalId, transaction) {
+        let beer = null;
+
+        try {
+            beer = await this.model.findOne({
+                where: {
+                    external_id: externalId
+                },
+                transaction
+            });
+        } catch (error) {
+            this._baseErrorHandler(error);
+
+            throw error;
+        }
 
         if (!beer) {
             throw new NotFoundError('The favorite beer was not found');
@@ -59,17 +67,23 @@ class BeerRepository extends BaseRepository {
 
     async addBeer(beer, transaction) {
         const {id, ...beerEntity} = beer;
+        let addedBeer = null;
 
-        let addedBeer = await this._sequelizeErrorHandler(this.model.upsert, this.model, {
-            external_id: id,
-            ...beerEntity
-        }, {transaction});
+        try {
+            addedBeer = await this.model.upsert({
+                external_id: id,
+                ...beerEntity
+            }, {
+                transaction,
+                returning: true
+            });
+        } catch (error) {
+            this._baseErrorHandler(error);
 
-        if (!addedBeer) {
-            addedBeer = await this.getBeerByExternalId(id, transaction);
+            throw error;
         }
 
-        return addedBeer;
+        return addedBeer[0];
     }
 
     async _request(url, params) {

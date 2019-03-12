@@ -3,21 +3,21 @@ const config = require('config');
 const DEBUG = config.get('DEBUG');
 
 const errorHandleMiddleware = function (error, req, res, next) {
-    const answer = {
+    const responseError = {
         statusCode: error.statusCode,
         message: error.message
     };
 
     if (DEBUG) {
         if (error.statusCode >= 500) {
-            answer.stackTrace = error.stack;
+            responseError.stackTrace = error.stack;
         }
 
-        answer.initError = error.initError;
+        responseError.initError = error.initError;
     }
 
     res.status(error.statusCode);
-    res.send(answer);
+    res.send(responseError);
 };
 
 module.exports = errorHandleMiddleware;

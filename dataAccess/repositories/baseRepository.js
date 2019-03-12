@@ -6,21 +6,13 @@ class BaseRepository {
         this.model = model;
     }
 
-    async _sequelizeErrorHandler(callback, context, ...args) {
-        try {
-            const result = await Reflect.apply(callback, context, args);
+    _baseErrorHandler(error) {
+        if (error.name === SQL_ERRORS.SequelizeConnectionRefusedError) {
+            throw new FailedDependencyError('Database connection refused', error);
+        }
 
-            return result;
-        } catch (error) {
-            if (error.name === SQL_ERRORS.SequelizeConnectionRefusedError) {
-                throw new FailedDependencyError('Database connection refused', error);
-            }
-
-            if (error.name === SQL_ERRORS.SequelizeValidationError) {
-                throw new UnprocessableEntityError(`Validation error: ${error.message}`, error);
-            }
-
-            throw error;
+        if (error.name === SQL_ERRORS.SequelizeValidationError) {
+            throw new UnprocessableEntityError(`Validation error: ${error.message}`, error);
         }
     }
 }

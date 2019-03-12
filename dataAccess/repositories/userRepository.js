@@ -21,11 +21,18 @@ class UserRepository extends BaseRepository {
 
     async getUser(searchCriteria, transaction) {
         const mappedSearchCriteria = mapper(searchCriteria, MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE);
-        const user = await this._sequelizeErrorHandler(this.model.findOne, this.model, {
-            where: mappedSearchCriteria,
-            transaction
-        });
+        let user = null;
 
+        try {
+            user = await this.model.findOne({
+                where: mappedSearchCriteria,
+                transaction
+            });
+        } catch (error) {
+            this._baseErrorHandler(error);
+
+            throw error;
+        }
 
         if (!user) {
             throw new NotFoundError('The user was not found');
@@ -38,10 +45,12 @@ class UserRepository extends BaseRepository {
         const userProperties = mapper(user, MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE);
 
         try {
-            const createdUser = await this._sequelizeErrorHandler(this.model.create, this.model, userProperties);
+            const createdUser = await this.model.create(userProperties);
 
             return createdUser;
         } catch (error) {
+            this._baseErrorHandler(error);
+
             if (error.name === SQL_ERRORS.SequelizeUniqueConstraintError) {
                 throw new UnprocessableEntityError('Such email already exist', error);
             }
@@ -61,7 +70,15 @@ class UserRepository extends BaseRepository {
     async _favoriteBeerOperation(userId, favoriteBeer, operation, transaction) {
         const user = await this.getUser({id: userId}, transaction);
 
-        return this._sequelizeErrorHandler(user[operation], user, favoriteBeer, {transaction});
+        try {
+            const result = await user[operation](favoriteBeer, {transaction});
+
+            return result;
+        } catch (error) {
+            this._baseErrorHandler(error);
+
+            throw error;
+        }
     }
 }
 

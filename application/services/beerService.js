@@ -1,9 +1,9 @@
+const BaseService = require('./baseService');
 const {beerRepository, userRepository} = require('../../dataAccess/repositories');
-const sequelize = require('../../dataAccess/getSequelize');
 const {mapper} = require('../../helpers');
 const {BEER_PREVIEW_INFO} = require('../constants');
 
-class BeerService {
+class BeerService extends BaseService {
     async getBeers(paginationParams, filterParams) {
         const beers = await beerRepository.getAll(paginationParams, filterParams);
 
@@ -22,7 +22,7 @@ class BeerService {
         const beer = await this.getBeer(beerId);
         const beerPreviewInfo = mapper(beer, BEER_PREVIEW_INFO);
 
-        return sequelize.transaction(async (transaction) => {
+        return this._performTransaction(async (transaction) => {
             const favoriteBeer = await beerRepository.addBeer(beerPreviewInfo, transaction);
 
             return userRepository.addFavoriteBeer(userId, favoriteBeer, transaction);
@@ -30,7 +30,7 @@ class BeerService {
     }
 
     removeFavorite(beerId, userId) {
-        return sequelize.transaction(async (transaction) => {
+        return this._performTransaction(async (transaction) => {
             const favoriteBeer = await beerRepository.getBeerByExternalId(beerId, transaction);
 
             return userRepository.removeFavoriteBeer(userId, favoriteBeer, transaction);
