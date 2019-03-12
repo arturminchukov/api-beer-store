@@ -59,19 +59,33 @@ class UserRepository extends BaseRepository {
         }
     }
 
-    addFavoriteBeer(userId, favoriteBeer, transaction) {
-        return this._favoriteBeerOperation(userId, favoriteBeer, this.beerAccessors.add, transaction);
+    async addFavoriteBeer(userId, favoriteBeer, transaction) {
+        const addedFavoriteBeer = await this._favoriteBeerOperation(userId, this.beerAccessors.add, favoriteBeer, transaction);
+
+        if (addedFavoriteBeer.length < 1) {
+            throw new NotFoundError('Such favorite beer already exist');
+        }
+
+        return addedFavoriteBeer;
     }
 
-    removeFavoriteBeer(userId, favoriteBeer, transaction) {
-        return this._favoriteBeerOperation(userId, favoriteBeer, this.beerAccessors.remove, transaction);
+    async removeFavoriteBeer(userId, favoriteBeer, transaction) {
+        const removedFavoriteBeer = await this._favoriteBeerOperation(userId, this.beerAccessors.remove, favoriteBeer, transaction);
+
+        if (removedFavoriteBeer < 1) {
+            throw new NotFoundError('The favorite beer was not found');
+        }
+
+        return removedFavoriteBeer;
     }
 
-    async _favoriteBeerOperation(userId, favoriteBeer, operation, transaction) {
+    async _favoriteBeerOperation(userId, operation, queryParams, transaction) {
         const user = await this.getUser({id: userId}, transaction);
 
         try {
-            const result = await user[operation](favoriteBeer, {transaction});
+            const result = await user[operation](queryParams, {
+                transaction
+            });
 
             return result;
         } catch (error) {
