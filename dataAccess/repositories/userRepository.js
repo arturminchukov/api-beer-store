@@ -2,7 +2,7 @@ const sequelize = require('../getSequelize');
 const {userModel} = require('../models');
 const {mapper} = require('../../helpers');
 const {SQL_ERRORS} = require('../constants');
-const {MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION} = require('../mappers');
+const {MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION, MAP_BEER_DATABASE_PROPERTIES_TO_APLLICATION} = require('../mappers');
 const {NotFoundError, UnprocessableEntityError} = require('../../errors');
 const BaseRepository = require('./baseRepository');
 
@@ -59,19 +59,31 @@ class UserRepository extends BaseRepository {
         }
     }
 
-    async getFavorites(userId, paginationParams) {
-        const databasePaginationParams = {
-            limit: paginationParams.pageSize,
-            offset: (paginationParams.pageNumber - 1) * paginationParams.pageSize
-        };
-
-        const beers = await this._favoriteBeerOperation(userId, this.beerAccessors.get, databasePaginationParams);
+    async getPaginatedFavoriteBeers(userId, paginationParams) {
+        const beers = await this.getFavoriteBeers(userId, paginationParams);
         const beerCount = await this._favoriteBeerOperation(userId, this.beerAccessors.count);
 
         return {
             items: beers,
             count: beerCount
         };
+    }
+
+    async getFavoriteBeers(userId, paginationParams) {
+        let databasePaginationParams = null;
+
+        if (paginationParams) {
+            databasePaginationParams = {
+                limit: paginationParams.pageSize,
+                offset: (paginationParams.pageNumber - 1) * paginationParams.pageSize
+            };
+        }
+
+        let beers = await this._favoriteBeerOperation(userId, this.beerAccessors.get, databasePaginationParams);
+
+        beers = beers.map(beer => mapper(beer, MAP_BEER_DATABASE_PROPERTIES_TO_APLLICATION));
+
+        return beers;
     }
 
     async addFavoriteBeer(userId, favoriteBeer, transaction) {

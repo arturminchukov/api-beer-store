@@ -4,8 +4,8 @@ const {mapper} = require('../../helpers');
 const {BEER_PREVIEW_INFO} = require('../constants');
 
 class BeerService extends BaseService {
-    async getBeers(paginationParams, filterParams) {
-        const beers = await beerRepository.getAll(paginationParams, filterParams);
+    async getBeers(paginationParams, filterParams, userId) {
+        const beers = await beerRepository.getAll(paginationParams, filterParams, userId);
 
         return {
             pageNumber: paginationParams.pageNumber,
@@ -19,7 +19,7 @@ class BeerService extends BaseService {
     }
 
     async getFavoriteBeers(userId, paginationParams) {
-        const {items, count} = await userRepository.getFavorites(userId, paginationParams);
+        const {items, count} = await userRepository.getPaginatedFavoriteBeers(userId, paginationParams);
         const next = this._getNext(paginationParams.pageNumber, paginationParams.pageSize, count);
 
         return {
@@ -27,17 +27,6 @@ class BeerService extends BaseService {
             count,
             next
         };
-    }
-
-    _getNext(currentPage, pageSize, count) {
-        if (currentPage * pageSize < count) {
-            return {
-                pageSize,
-                pageNumber: currentPage + 1
-            };
-        }
-
-        return null;
     }
 
     async addFavoriteBeer(beerId, userId) {
@@ -57,6 +46,17 @@ class BeerService extends BaseService {
 
             return userRepository.removeFavoriteBeer(userId, favoriteBeer, transaction);
         });
+    }
+
+    _getNext(currentPage, pageSize, count) {
+        if (currentPage * pageSize < count) {
+            return {
+                pageSize,
+                pageNumber: currentPage + 1
+            };
+        }
+
+        return null;
     }
 }
 

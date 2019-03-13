@@ -3,7 +3,8 @@ const axios = require('axios');
 
 const {NotFoundError, InternalServerError, FailedDependencyError} = require('../../errors');
 const BaseRepository = require('./baseRepository');
-const {MAP_FILTER_PARAMS, MAP_PAGE_PARAMS} = require('../mappers');
+const userRepository = require('./userRepository');
+const {MAP_FILTER_PARAMS, MAP_PAGE_PARAMS, MAP_BEER_APPLICATION_PROPERTIES_TO_DATABASE} = require('../mappers');
 const {mapper} = require('../../helpers');
 const {beerModel} = require('../models');
 const sequelize = require('../getSequelize');
@@ -21,7 +22,7 @@ class BeerRepository extends BaseRepository {
         this.entity = 'beers';
     }
 
-    async getAll(paginationParams, filterParams) {
+    async getAll(paginationParams, filterParams, userId) {
         const mappedPageParams = mapper(paginationParams, MAP_PAGE_PARAMS);
         const mappedFilterParams = mapper(filterParams, MAP_FILTER_PARAMS);
 
@@ -32,6 +33,15 @@ class BeerRepository extends BaseRepository {
                 ...mappedFilterParams
             }
         );
+
+        const favoriteBeers = await userRepository.getFavoriteBeers(userId);
+        const favoriteBeerIds = favoriteBeers.map(favoriteBeer => favoriteBeer.id);
+
+        beers.forEach((beer) => {
+            if (favoriteBeerIds.includes(beer.id)) {
+                beer.isFavorite = true;
+            }
+        });
 
         return beers || [];
     }
@@ -66,14 +76,11 @@ class BeerRepository extends BaseRepository {
     }
 
     async addBeer(beer, transaction) {
-        const {id, ...beerEntity} = beer;
+        const mappedBeer = mapper(beer, MAP_BEER_APPLICATION_PROPERTIES_TO_DATABASE);
         let addedBeer = null;
 
         try {
-            addedBeer = await this.model.upsert({
-                external_id: id,
-                ...beerEntity
-            }, {
+            addedBeer = await this.model.upsert(mappedBeer, {
                 transaction,
                 returning: true
             });

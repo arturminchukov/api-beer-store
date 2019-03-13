@@ -5,18 +5,19 @@ const {mapper} = require('../../helpers');
 class BeerController {
     async getBeers(req, res) {
         const {query} = req;
-        const filterParams = mapper(query, FILTER_PARAMS_SCHEMA);
+        const {userId} = res.locals;
         const pageParams = mapper(query, PAGINATION_PARAMS_SCHEMA);
+        let paginatedBeers = null;
 
         if (query.isFavorite) {
-            const paginatedFavoriteBeers = await beerService.getFavoriteBeers(res.locals.userId, pageParams);
+            paginatedBeers = await beerService.getFavoriteBeers(userId, pageParams);
+        } else {
+            const filterParams = mapper(query, FILTER_PARAMS_SCHEMA);
 
-            return res.send(paginatedFavoriteBeers);
+            paginatedBeers = await beerService.getBeers(pageParams, filterParams, userId);
         }
 
-        const result = await beerService.getBeers(pageParams, filterParams);
-
-        res.send(result);
+        res.send(paginatedBeers);
     }
 
     async getBeer(req, res) {
