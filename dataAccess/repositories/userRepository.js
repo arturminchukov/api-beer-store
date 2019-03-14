@@ -1,22 +1,28 @@
-const sequelize = require('../getSequelize');
+const sequelizeInstance = require('../getSequelize');
 const {userModel} = require('../models');
 const {mapper} = require('../../helpers');
 const {SQL_ERRORS} = require('../constants');
-const {MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION, MAP_BEER_DATABASE_PROPERTIES_TO_APLLICATION} = require('../mappers');
-const {NotFoundError, UnprocessableEntityError} = require('../../errors');
+const {MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION} = require('../mappers');
+const {NotFoundError, UnprocessableEntityError, InternalServerError} = require('../../errors');
 const BaseRepository = require('./baseRepository');
 
 class UserRepository extends BaseRepository {
-    constructor(sequelizeInstance) {
-        super(sequelizeInstance.models[userModel.name]);
-
-        this.beerAccessors = this.model.associations.beers.accessors;
+    constructor(sequelize) {
+        super(sequelize, userModel.name);
     }
 
     async getUserEntity(searchCriteria) {
         const user = await this.getUser(searchCriteria);
 
         return mapper(user.dataValues, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION);
+    }
+
+    getUserById(id, transaction) {
+        if (!id) {
+            throw new InternalServerError('User id is undefined');
+        }
+
+        return this.getUser({id}, transaction);
     }
 
     async getUser(searchCriteria, transaction) {
@@ -58,69 +64,6 @@ class UserRepository extends BaseRepository {
             throw error;
         }
     }
-
-    async getPaginatedFavoriteBeers(userId, paginationParams) {
-        const beers = await this.getFavoriteBeers(userId, paginationParams);
-        const beerCount = await this._favoriteBeerOperation(userId, this.beerAccessors.count);
-
-        return {
-            items: beers,
-            count: beerCount
-        };
-    }
-
-    async getFavoriteBeers(userId, paginationParams) {
-        let databasePaginationParams = null;
-
-        if (paginationParams) {
-            databasePaginationParams = {
-                limit: paginationParams.pageSize,
-                offset: (paginationParams.pageNumber - 1) * paginationParams.pageSize
-            };
-        }
-
-        let beers = await this._favoriteBeerOperation(userId, this.beerAccessors.get, databasePaginationParams);
-
-        beers = beers.map(beer => mapper(beer, MAP_BEER_DATABASE_PROPERTIES_TO_APLLICATION));
-
-        return beers;
-    }
-
-    async addFavoriteBeer(userId, favoriteBeer, transaction) {
-        const addedFavoriteBeer = await this._favoriteBeerOperation(userId, this.beerAccessors.add, favoriteBeer, transaction);
-
-        if (addedFavoriteBeer.length < 1) {
-            throw new NotFoundError('Such favorite beer already exist');
-        }
-
-        return addedFavoriteBeer;
-    }
-
-    async removeFavoriteBeer(userId, favoriteBeer, transaction) {
-        const removedFavoriteBeer = await this._favoriteBeerOperation(userId, this.beerAccessors.remove, favoriteBeer, transaction);
-
-        if (removedFavoriteBeer < 1) {
-            throw new NotFoundError('The favorite beer was not found');
-        }
-
-        return removedFavoriteBeer;
-    }
-
-    async _favoriteBeerOperation(userId, operation, queryParams, transaction) {
-        const user = await this.getUser({id: userId}, transaction);
-
-        try {
-            const result = await user[operation](queryParams, {
-                transaction
-            });
-
-            return result;
-        } catch (error) {
-            this._baseErrorHandler(error);
-
-            throw error;
-        }
-    }
 }
 
-module.exports = new UserRepository(sequelize);
+module.exports = new UserRepository(sequelizeInstance);

@@ -4,6 +4,10 @@ const SQL_ERRORS = {
     SequelizeValidationError: 'SequelizeValidationError'
 };
 
+const BEER_PREVIEW_INFO = ['id', 'name', 'tagline', 'description', 'image_url'];
+
+
 module.exports = {
-    SQL_ERRORS
+    SQL_ERRORS,
+    BEER_PREVIEW_INFO
 };

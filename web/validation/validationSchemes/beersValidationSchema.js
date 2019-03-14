@@ -34,6 +34,16 @@ module.exports = {
                 },
                 isFavorite: {
                     type: 'boolean'
+                },
+                sortBy: {
+                    type: 'string',
+                    enum: ['id', 'external_id', 'created_at', 'updated_at', 'name', 'tagline'],
+                    default: 'updated_at'
+                },
+                sortByDirection: {
+                    type: 'string',
+                    enum: ['asc', 'desc'],
+                    default: 'desc'
                 }
             }
         }

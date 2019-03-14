@@ -7,23 +7,18 @@ class BeerController {
         const {query} = req;
         const {userId} = res.locals;
         const pageParams = mapper(query, PAGINATION_PARAMS_SCHEMA);
-        let paginatedBeers = null;
+        const filterParams = mapper(query, FILTER_PARAMS_SCHEMA);
 
-        if (query.isFavorite) {
-            paginatedBeers = await beerService.getFavoriteBeers(userId, pageParams);
-        } else {
-            const filterParams = mapper(query, FILTER_PARAMS_SCHEMA);
-
-            paginatedBeers = await beerService.getBeers(pageParams, filterParams, userId);
-        }
+        const paginatedBeers = await beerService.getBeers(pageParams, filterParams, userId);
 
         res.send(paginatedBeers);
     }
 
     async getBeer(req, res) {
         const beerId = req.params.id;
+        const {userId} = res.locals;
 
-        const result = await beerService.getBeer(beerId);
+        const result = await beerService.getBeer(beerId, userId);
 
         res.send(result);
     }

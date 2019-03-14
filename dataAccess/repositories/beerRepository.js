@@ -3,53 +3,114 @@ const axios = require('axios');
 
 const {NotFoundError, InternalServerError, FailedDependencyError} = require('../../errors');
 const BaseRepository = require('./baseRepository');
-const userRepository = require('./userRepository');
-const {MAP_FILTER_PARAMS, MAP_PAGE_PARAMS, MAP_BEER_APPLICATION_PROPERTIES_TO_DATABASE} = require('../mappers');
+const {MAP_FILTER_PARAMS, MAP_PAGE_PARAMS, MAP_BEER_APPLICATION_PROPERTIES_TO_DATABASE, MAP_BEER_DATABASE_PROPERTIES_TO_APLLICATION} = require('../mappers');
 const {mapper} = require('../../helpers');
 const {beerModel} = require('../models');
-const sequelize = require('../getSequelize');
+const sequelizeInstance = require('../getSequelize');
+const {BEER_PREVIEW_INFO} = require('../constants');
 
 const API_URL = config.get('EXTERNAL_RESOURCES.API_URL');
 
 class BeerRepository extends BaseRepository {
-    constructor(sequelizeInstance) {
-        super(sequelizeInstance.models[beerModel.name]);
+    constructor(sequelize) {
+        super(sequelize, beerModel.name);
 
         this.client = axios.create({
             baseURL: API_URL,
             method: 'get'
         });
         this.entity = 'beers';
+        this.beerAccessors = {
+            count: 'countBeers',
+            get: 'getBeers',
+            add: 'addBeer',
+            remove: 'removeBeer'
+        };
     }
 
-    async getAll(paginationParams, filterParams, userId) {
-        const mappedPageParams = mapper(paginationParams, MAP_PAGE_PARAMS);
-        const mappedFilterParams = mapper(filterParams, MAP_FILTER_PARAMS);
+    async addBeer(beer, transaction) {
+        const mappedBeer = mapper(beer, MAP_BEER_APPLICATION_PROPERTIES_TO_DATABASE);
+        let addedBeer = null;
 
-        const beers = await this._request(
-            `/${this.entity}`,
-            {
-                ...mappedPageParams,
-                ...mappedFilterParams
-            }
-        );
+        try {
+            addedBeer = await this.model.upsert(mappedBeer, {
+                transaction,
+                returning: true
+            });
+        } catch (error) {
+            this._baseErrorHandler(error);
 
-        const favoriteBeers = await userRepository.getFavoriteBeers(userId);
-        const favoriteBeerIds = favoriteBeers.map(favoriteBeer => favoriteBeer.id);
+            throw error;
+        }
 
-        beers.forEach((beer) => {
-            if (favoriteBeerIds.includes(beer.id)) {
-                beer.isFavorite = true;
-            }
+        return addedBeer[0];
+    }
+
+    async addFavoriteBeer(user, beerId) {
+        const beer = await this.get(beerId);
+        const beerPreviewInfo = mapper(beer, BEER_PREVIEW_INFO);
+
+        const addedFavoriteBeer = await this._performTransaction(async (transaction) => {
+            const favoriteBeer = await this.addBeer(beerPreviewInfo, transaction);
+
+            return this._favoriteBeerOperation(user, this.beerAccessors.add, favoriteBeer, transaction);
         });
 
-        return beers || [];
+
+        if (addedFavoriteBeer.length < 1) {
+            throw new NotFoundError('Such favorite beer already exist');
+        }
+
+        return addedFavoriteBeer;
+    }
+
+    async getBeerById(user, id) {
+        const favoriteBeers = await this.getFavoriteBeers(user);
+        const beer = await this.get(id);
+
+        this._markFavoriteFlag([beer], favoriteBeers);
+
+        return beer;
     }
 
     async get(beerId) {
         const beers = await this._request(`/${this.entity}/${beerId}`);
 
         return beers[0];
+    }
+
+    async getAll(user, paginationParams, filterParams) {
+        const mappedPageParams = mapper(paginationParams, MAP_PAGE_PARAMS);
+        const mappedFilterParams = mapper(filterParams, MAP_FILTER_PARAMS);
+        let beers = null;
+        let count = null;
+
+        if (filterParams.isFavorite) {
+            ({
+                items: beers,
+                count
+            } = await this.getPaginatedFavoriteBeers(user, paginationParams));
+        } else {
+            beers = await this._request(
+                `/${this.entity}`,
+                {
+                    ...mappedPageParams,
+                    ...mappedFilterParams
+                }
+            );
+
+            const favoriteBeers = await this.getFavoriteBeers(user);
+
+            this._markFavoriteFlag(beers, favoriteBeers);
+        }
+
+
+        return {
+            pageNumber: paginationParams.pageNumber,
+            pageSize: paginationParams.pageSize,
+            items: beers || [],
+            count
+        };
     }
 
     async getBeerByExternalId(externalId, transaction) {
@@ -75,22 +136,66 @@ class BeerRepository extends BaseRepository {
         return beer;
     }
 
-    async addBeer(beer, transaction) {
-        const mappedBeer = mapper(beer, MAP_BEER_APPLICATION_PROPERTIES_TO_DATABASE);
-        let addedBeer = null;
+    async getFavoriteBeers(user, paginationParams) {
+        let databasePaginationParams = null;
 
+        if (paginationParams) {
+            databasePaginationParams = this._getdatabasePaginationParams(paginationParams);
+        }
+
+        let beers = await this._favoriteBeerOperation(user, this.beerAccessors.get, databasePaginationParams);
+
+        beers = beers.map(beer => mapper(beer, MAP_BEER_DATABASE_PROPERTIES_TO_APLLICATION));
+
+        return beers;
+    }
+
+    async getPaginatedFavoriteBeers(user, paginationParams) {
+        const beers = await this.getFavoriteBeers(user, paginationParams);
+        const beerCount = await this._favoriteBeerOperation(user, this.beerAccessors.count);
+
+        return {
+            items: beers,
+            count: beerCount
+        };
+    }
+
+    async removeFavoriteBeer(user, beerId) {
+        const removedFavoriteBeer = await this._performTransaction(async (transaction) => {
+            const favoriteBeer = await this.getBeerByExternalId(beerId, transaction);
+
+            return this._favoriteBeerOperation(user, this.beerAccessors.remove, favoriteBeer, transaction);
+        });
+
+        if (removedFavoriteBeer < 1) {
+            throw new NotFoundError('The favorite beer was not found');
+        }
+
+        return removedFavoriteBeer;
+    }
+
+    async _favoriteBeerOperation(user, operation, operationParams, transaction) {
         try {
-            addedBeer = await this.model.upsert(mappedBeer, {
-                transaction,
-                returning: true
+            const result = await user[operation](operationParams, {
+                transaction
             });
+
+            return result;
         } catch (error) {
             this._baseErrorHandler(error);
 
             throw error;
         }
+    }
 
-        return addedBeer[0];
+    _markFavoriteFlag(beers, favoriteBeers) {
+        const favoriteBeerIds = favoriteBeers.map(favoriteBeer => favoriteBeer.id);
+
+        beers.forEach((beer) => {
+            if (favoriteBeerIds.includes(beer.id)) {
+                beer.isFavorite = true;
+            }
+        });
     }
 
     async _request(url, params) {
@@ -118,4 +223,4 @@ class BeerRepository extends BaseRepository {
     }
 }
 
-module.exports = new BeerRepository(sequelize);
+module.exports = new BeerRepository(sequelizeInstance);
