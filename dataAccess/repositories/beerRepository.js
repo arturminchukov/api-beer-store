@@ -20,12 +20,6 @@ class BeerRepository extends BaseRepository {
             method: 'get'
         });
         this.entity = 'beers';
-        this.beerAccessors = {
-            count: 'countBeers',
-            get: 'getBeers',
-            add: 'addBeer',
-            remove: 'removeBeer'
-        };
     }
 
     async addBeer(beer, transaction) {
@@ -46,22 +40,30 @@ class BeerRepository extends BaseRepository {
         return addedBeer[0];
     }
 
-    async addFavoriteBeer(user, beerId) {
+    async addFavoriteBeer(userId, beerId) {
         const beer = await this.get(beerId);
         const beerPreviewInfo = mapper(beer, BEER_PREVIEW_INFO);
 
-        const addedFavoriteBeer = await this._performTransaction(async (transaction) => {
+        const isFavoriteBeerAdded = await this._performTransaction(async (transaction) => {
             const favoriteBeer = await this.addBeer(beerPreviewInfo, transaction);
 
-            return this._favoriteBeerOperation(user, this.beerAccessors.add, favoriteBeer, transaction);
+            try {
+                const addedFavoriteUser = await favoriteBeer.addUser(userId, {transaction});
+
+                return Boolean(addedFavoriteUser);
+            } catch (error) {
+                this._baseErrorHandler(error);
+
+                throw error;
+            }
         });
 
 
-        if (addedFavoriteBeer.length < 1) {
+        if (!isFavoriteBeerAdded) {
             throw new NotFoundError('Such favorite beer already exist');
         }
 
-        return addedFavoriteBeer;
+        return isFavoriteBeerAdded;
     }
 
     async get(beerId) {
@@ -166,32 +168,26 @@ class BeerRepository extends BaseRepository {
         return beer;
     }
 
-    async removeFavoriteBeer(user, beerId) {
-        const removedFavoriteBeer = await this._performTransaction(async (transaction) => {
+    async removeFavoriteBeer(userId, beerId) {
+        const isFavoriteBeerRemoved = await this._performTransaction(async (transaction) => {
             const favoriteBeer = await this.getBeerByExternalId(beerId, transaction);
 
-            return this._favoriteBeerOperation(user, this.beerAccessors.remove, favoriteBeer, transaction);
+            try {
+                const removedFavoriteBeer = await favoriteBeer.removeUser(userId, {transaction});
+
+                return Boolean(removedFavoriteBeer);
+            } catch (error) {
+                this._baseErrorHandler(error);
+
+                throw error;
+            }
         });
 
-        if (removedFavoriteBeer < 1) {
+        if (!isFavoriteBeerRemoved) {
             throw new NotFoundError('The favorite beer was not found');
         }
 
-        return removedFavoriteBeer;
-    }
-
-    async _favoriteBeerOperation(user, operation, operationParams, transaction) {
-        try {
-            const result = await user[operation](operationParams, {
-                transaction
-            });
-
-            return result;
-        } catch (error) {
-            this._baseErrorHandler(error);
-
-            throw error;
-        }
+        return isFavoriteBeerRemoved;
     }
 
     _markFavoriteFlag(beers, favoriteBeers) {

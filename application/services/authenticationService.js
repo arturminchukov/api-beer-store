@@ -43,6 +43,7 @@ class AuthenticationService {
 
         try {
             decodedData = await asyncJwt.verifyToken(tokenToCheck, SECRET_TOKEN_KEY);
+            await userService.getUserByEmail(decodedData.email);
         } catch (error) {
             throw new UnauthorizedError('Invalid token', error);
         }

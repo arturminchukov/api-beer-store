@@ -1,4 +1,4 @@
-const {beerRepository, userRepository} = require('../../dataAccess/repositories');
+const {beerRepository} = require('../../dataAccess/repositories');
 
 class BeerService {
     getBeers(paginationParams, filterParams, userId) {
@@ -9,20 +9,12 @@ class BeerService {
         return beerRepository.getBeerById(userId, beerId);
     }
 
-    async addFavoriteBeer(beerId, userId) {
-        const user = await this._getUserById(userId);
-
-        return beerRepository.addFavoriteBeer(user, beerId);
+    addFavoriteBeer(beerId, userId) {
+        return beerRepository.addFavoriteBeer(userId, beerId);
     }
 
-    async removeFavorite(beerId, userId) {
-        const user = await this._getUserById(userId);
-
-        return beerRepository.removeFavoriteBeer(user, beerId);
-    }
-
-    _getUserById(id) {
-        return userRepository.getUserById(id);
+    removeFavorite(beerId, userId) {
+        return beerRepository.removeFavoriteBeer(userId, beerId);
     }
 }
 
