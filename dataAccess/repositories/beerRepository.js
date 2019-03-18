@@ -64,8 +64,14 @@ class BeerRepository extends BaseRepository {
         return addedFavoriteBeer;
     }
 
-    async getBeerById(user, id) {
-        const favoriteBeers = await this.getFavoriteBeers(user);
+    async get(beerId) {
+        const beers = await this._request(`/${this.entity}/${beerId}`);
+
+        return beers[0];
+    }
+
+    async getBeerById(userId, id) {
+        const {beers: favoriteBeers} = await this.getFavoriteBeers(userId);
         const beer = await this.get(id);
 
         this._markFavoriteFlag([beer], favoriteBeers);
@@ -73,13 +79,37 @@ class BeerRepository extends BaseRepository {
         return beer;
     }
 
-    async get(beerId) {
-        const beers = await this._request(`/${this.entity}/${beerId}`);
+    async getFavoriteBeers(userId, paginationParams) {
+        let databasePaginationParams = null;
 
-        return beers[0];
+        if (paginationParams) {
+            databasePaginationParams = this._getdatabasePaginationParams(paginationParams);
+        }
+
+        const {count, rows} = await this.model.findAndCountAll({
+            include: [{
+                model: this.sequelize.models.user,
+                where: {
+                    id: userId
+                },
+                attributes: []
+            }],
+            attributes: {
+                exclude: ['id']
+            },
+            raw: true,
+            ...databasePaginationParams
+        });
+
+        const beers = rows.map(beer => mapper(beer, MAP_BEER_DATABASE_PROPERTIES_TO_APLLICATION));
+
+        return {
+            count,
+            beers
+        };
     }
 
-    async getAll(user, paginationParams, filterParams) {
+    async getAll(userId, paginationParams, filterParams) {
         const mappedPageParams = mapper(paginationParams, MAP_PAGE_PARAMS);
         const mappedFilterParams = mapper(filterParams, MAP_FILTER_PARAMS);
         let beers = null;
@@ -87,9 +117,9 @@ class BeerRepository extends BaseRepository {
 
         if (filterParams.isFavorite) {
             ({
-                items: beers,
+                beers,
                 count
-            } = await this.getPaginatedFavoriteBeers(user, paginationParams));
+            } = await this.getFavoriteBeers(userId, paginationParams));
         } else {
             beers = await this._request(
                 `/${this.entity}`,
@@ -99,7 +129,7 @@ class BeerRepository extends BaseRepository {
                 }
             );
 
-            const favoriteBeers = await this.getFavoriteBeers(user);
+            const {beers: favoriteBeers} = await this.getFavoriteBeers(userId);
 
             this._markFavoriteFlag(beers, favoriteBeers);
         }
@@ -134,30 +164,6 @@ class BeerRepository extends BaseRepository {
         }
 
         return beer;
-    }
-
-    async getFavoriteBeers(user, paginationParams) {
-        let databasePaginationParams = null;
-
-        if (paginationParams) {
-            databasePaginationParams = this._getdatabasePaginationParams(paginationParams);
-        }
-
-        let beers = await this._favoriteBeerOperation(user, this.beerAccessors.get, databasePaginationParams);
-
-        beers = beers.map(beer => mapper(beer, MAP_BEER_DATABASE_PROPERTIES_TO_APLLICATION));
-
-        return beers;
-    }
-
-    async getPaginatedFavoriteBeers(user, paginationParams) {
-        const beers = await this.getFavoriteBeers(user, paginationParams);
-        const beerCount = await this._favoriteBeerOperation(user, this.beerAccessors.count);
-
-        return {
-            items: beers,
-            count: beerCount
-        };
     }
 
     async removeFavoriteBeer(user, beerId) {

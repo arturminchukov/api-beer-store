@@ -1,16 +1,12 @@
 const {beerRepository, userRepository} = require('../../dataAccess/repositories');
 
 class BeerService {
-    async getBeers(paginationParams, filterParams, userId) {
-        const user = await this._getUserById(userId);
-
-        return beerRepository.getAll(user, paginationParams, filterParams);
+    getBeers(paginationParams, filterParams, userId) {
+        return beerRepository.getAll(userId, paginationParams, filterParams);
     }
 
-    async getBeer(beerId, userId) {
-        const user = await this._getUserById(userId);
-
-        return beerRepository.getBeerById(user, beerId);
+    getBeer(beerId, userId) {
+        return beerRepository.getBeerById(userId, beerId);
     }
 
     async addFavoriteBeer(beerId, userId) {

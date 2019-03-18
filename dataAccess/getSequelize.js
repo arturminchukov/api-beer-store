@@ -22,21 +22,21 @@ const getSequelize = function (modelList) {
     });
 
     const User = sequelize.models[userModel.name];
-    const Favorites = sequelize.models[beerModel.name];
-    const UserFavorites = sequelize.models[userBeerModel.name];
+    const Beers = sequelize.models[beerModel.name];
+    const UserBeers = sequelize.models[userBeerModel.name];
 
-    User.belongsToMany(Favorites, {
+    User.belongsToMany(Beers, {
         through: {
-            model: UserFavorites,
+            model: UserBeers,
             unique: false
         },
         foreignKey: 'user_id',
         constraints: false
     });
 
-    Favorites.belongsToMany(User, {
+    Beers.belongsToMany(User, {
         through: {
-            model: UserFavorites,
+            model: UserBeers,
             unique: false
         },
         foreignKey: 'beer_id',
