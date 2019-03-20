@@ -1,20 +1,20 @@
 const {beerRepository} = require('../../dataAccess/repositories');
 
 class BeerService {
-    getBeers(paginationParams, filterParams, userId) {
-        return beerRepository.getAll(userId, paginationParams, filterParams);
+    getBeers(paginationParams, filterParams, user) {
+        return beerRepository.getAll(user.id, paginationParams, filterParams);
     }
 
-    getBeer(beerId, userId) {
-        return beerRepository.getBeerById(userId, beerId);
+    getBeer(beerId, user) {
+        return beerRepository.getBeerById(user.id, beerId);
     }
 
-    addFavoriteBeer(beerId, userId) {
-        return beerRepository.addFavoriteBeer(userId, beerId);
+    addFavoriteBeer(beerId, user) {
+        return beerRepository.addFavoriteBeer(user.id, beerId);
     }
 
-    removeFavorite(beerId, userId) {
-        return beerRepository.removeFavoriteBeer(userId, beerId);
+    removeFavorite(beerId, user) {
+        return beerRepository.removeFavoriteBeer(user.id, beerId);
     }
 }
 

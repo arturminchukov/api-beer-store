@@ -18,7 +18,7 @@ const middlewareBeersValidator = validationMiddlewareFactory(beersValidationSche
 
 router.get('/', authenticationMiddleware, middlewareBeersValidator, routerWrapper(getBeers));
 router.get('/:id', authenticationMiddleware, middlewareBeerValidator, routerWrapper(getBeer));
-router.post('/:id/favorite', authenticationMiddleware, middlewareBeerValidator, routerWrapper(addToFavorite));
-router.delete('/:id/favorite', authenticationMiddleware, middlewareBeerValidator, routerWrapper(removeFromFavorite));
+router.post('/:externalId/favorite', authenticationMiddleware, middlewareBeerValidator, routerWrapper(addToFavorite));
+router.delete('/:externalId/favorite', authenticationMiddleware, middlewareBeerValidator, routerWrapper(removeFromFavorite));
 
 module.exports = router;

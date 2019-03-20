@@ -3,7 +3,7 @@ const {userModel} = require('../models');
 const {mapper} = require('../../helpers');
 const {SQL_ERRORS} = require('../constants');
 const {MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION} = require('../mappers');
-const {NotFoundError, UnprocessableEntityError, InternalServerError} = require('../../errors');
+const {NotFoundError, UnprocessableEntityError} = require('../../errors');
 const BaseRepository = require('./baseRepository');
 
 class UserRepository extends BaseRepository {
@@ -15,14 +15,6 @@ class UserRepository extends BaseRepository {
         const user = await this.getUser(searchCriteria);
 
         return mapper(user.dataValues, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION);
-    }
-
-    getUserById(id, transaction) {
-        if (!id) {
-            throw new InternalServerError('User id is undefined');
-        }
-
-        return this.getUser({id}, transaction);
     }
 
     async getUser(searchCriteria, transaction) {

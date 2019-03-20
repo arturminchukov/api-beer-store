@@ -34,16 +34,17 @@ class AuthenticationService {
 
         return {
             token,
-            userId: user.id
+            user
         };
     }
 
     async authenticateByToken(tokenToCheck) {
         let decodedData = null;
+        let user = null;
 
         try {
             decodedData = await asyncJwt.verifyToken(tokenToCheck, SECRET_TOKEN_KEY);
-            await userService.getUserByEmail(decodedData.email);
+            user = await userService.getUserByEmail(decodedData.email);
         } catch (error) {
             throw new UnauthorizedError('Invalid token', error);
         }
@@ -57,7 +58,7 @@ class AuthenticationService {
 
         return {
             token,
-            userId
+            user
         };
     }
 }
