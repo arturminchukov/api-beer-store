@@ -16,7 +16,7 @@ const errorHandleMiddleware = function (error, req, res, next) {
         responseError.initError = error.initError;
     }
 
-    res.status(error.statusCode);
+    res.status(error.statusCode || 500);
     res.send(responseError);
 };
 

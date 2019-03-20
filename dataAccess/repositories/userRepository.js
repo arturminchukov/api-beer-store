@@ -1,4 +1,4 @@
-const sequelize = require('../getSequelize');
+const sequelizeInstance = require('../getSequelize');
 const {userModel} = require('../models');
 const {mapper} = require('../../helpers');
 const {SQL_ERRORS} = require('../constants');
@@ -7,10 +7,8 @@ const {NotFoundError, UnprocessableEntityError} = require('../../errors');
 const BaseRepository = require('./baseRepository');
 
 class UserRepository extends BaseRepository {
-    constructor(sequelizeInstance) {
-        super(sequelizeInstance.models[userModel.name]);
-
-        this.beerAccessors = this.model.associations.beers.accessors;
+    constructor(sequelize) {
+        super(sequelize, userModel.name);
     }
 
     async getUserEntity(searchCriteria) {
@@ -58,42 +56,6 @@ class UserRepository extends BaseRepository {
             throw error;
         }
     }
-
-    async addFavoriteBeer(userId, favoriteBeer, transaction) {
-        const addedFavoriteBeer = await this._favoriteBeerOperation(userId, this.beerAccessors.add, favoriteBeer, transaction);
-
-        if (addedFavoriteBeer.length < 1) {
-            throw new NotFoundError('Such favorite beer already exist');
-        }
-
-        return addedFavoriteBeer;
-    }
-
-    async removeFavoriteBeer(userId, favoriteBeer, transaction) {
-        const removedFavoriteBeer = await this._favoriteBeerOperation(userId, this.beerAccessors.remove, favoriteBeer, transaction);
-
-        if (removedFavoriteBeer < 1) {
-            throw new NotFoundError('The favorite beer was not found');
-        }
-
-        return removedFavoriteBeer;
-    }
-
-    async _favoriteBeerOperation(userId, operation, queryParams, transaction) {
-        const user = await this.getUser({id: userId}, transaction);
-
-        try {
-            const result = await user[operation](queryParams, {
-                transaction
-            });
-
-            return result;
-        } catch (error) {
-            this._baseErrorHandler(error);
-
-            throw error;
-        }
-    }
 }
 
-module.exports = new UserRepository(sequelize);
+module.exports = new UserRepository(sequelizeInstance);
