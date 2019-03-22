@@ -8,6 +8,10 @@ const userModel = {
             autoIncrement: true,
             primaryKey: true
         },
+        external_beer_id: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+        },
         date: {
             type: Sequelize.DATE,
             allowNull: false
