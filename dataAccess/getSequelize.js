@@ -45,7 +45,7 @@ const getSequelize = function (modelList) {
         constraints: false
     });
 
-    BeerTypes.hasMany(Brews, {
+    Brews.belongsTo(BeerTypes, {
         foreignKey: 'beer_type_id',
         constraints: false
     });

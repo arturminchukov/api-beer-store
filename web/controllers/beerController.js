@@ -30,7 +30,7 @@ class BeerController {
         await beerService.addFavoriteBeer(beerId, user);
 
         res.status(204)
-            .send('helo');
+            .end();
     }
 
     async removeFavorite(req, res) {

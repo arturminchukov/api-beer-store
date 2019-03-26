@@ -3,7 +3,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
-const {beerRouter, userRouter} = require('./routers');
+const {beerRouter, userRouter, brewRouter} = require('./routers');
 const {logger} = require('../modules');
 const {errorHandleMiddleware, errorLogMiddleware} = require('./middlewares');
 
@@ -22,6 +22,7 @@ const configureLogger = function (app) {
 
 const configureRoutes = function (app) {
     app.use('/beers', beerRouter);
+    app.use('/brews', brewRouter);
     app.use('/users', userRouter);
 };
 

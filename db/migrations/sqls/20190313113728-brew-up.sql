@@ -8,7 +8,7 @@ CREATE TABLE beer_types(
 CREATE TABLE brews(
     id SERIAL PRIMARY KEY,
     external_beer_id INTEGER NOT NUll,
-    date TIMESTAMP WITH TIME ZONE NOT NULL,
+    date INTEGER NOT NULL,
     location VARCHAR(512),
     ingredients TEXT,
     brewing_method TEXT,

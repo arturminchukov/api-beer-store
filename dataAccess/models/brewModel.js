@@ -8,12 +8,13 @@ const userModel = {
             autoIncrement: true,
             primaryKey: true
         },
-        external_beer_id: {
+        externalBeerId: {
             type: Sequelize.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'external_beer_id'
         },
         date: {
-            type: Sequelize.DATE,
+            type: Sequelize.INTEGER,
             allowNull: false
         },
         location: {
@@ -22,40 +23,41 @@ const userModel = {
         ingredients: {
             type: Sequelize.TEXT
         },
-        brewing_method: {
-            type: Sequelize.TEXT
+        brewingMethod: {
+            type: Sequelize.TEXT,
+            field: 'brewing_method'
         },
-        brew_name: {
+        brewName: {
             type: Sequelize.STRING(128),
-            allowNull: false
+            allowNull: false,
+            field: 'brew_name'
         },
-        images_collection: {
-            type: Sequelize.TEXT
+        imagesCollection: {
+            type: Sequelize.TEXT,
+            field: 'images_collection'
         },
         impressions: {
             type: Sequelize.TEXT
         },
-        beer_type_id: {
+        beerTypeId: {
             type: Sequelize.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'beer_type_id'
         },
-        beer_id: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
-        created_at: {
+        createdAt: {
             type: Sequelize.DATE,
             allowNull: false,
-            defaultValue: Sequelize.NOW
+            defaultValue: Sequelize.NOW,
+            field: 'created_at'
         },
-        updated_at: {
+        updatedAt: {
             type: Sequelize.DATE,
             allowNull: false,
-            defaultValue: Sequelize.NOW
+            defaultValue: Sequelize.NOW,
+            field: 'updated_at'
         }
     },
     options: {
-        underscored: true,
         timestamps: true,
         tableName: 'brews'
     }
