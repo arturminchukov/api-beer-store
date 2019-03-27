@@ -10,7 +10,8 @@ const beerTypeModel = {
         },
         name: {
             type: Sequelize.STRING(64),
-            allowNull: false
+            allowNull: false,
+            unique: true
         },
         created_at: {
             type: Sequelize.DATE,

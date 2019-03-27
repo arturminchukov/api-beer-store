@@ -15,6 +15,10 @@ class BaseRepository {
         if (error.name === SQL_ERRORS.SequelizeValidationError) {
             throw new UnprocessableEntityError(`Validation error: ${error.message}`, error);
         }
+
+        if (error.name === SQL_ERRORS.SequelizeUniqueConstraintError) {
+            throw new UnprocessableEntityError(`Validation error: ${error.name}`, error);
+        }
     }
 
     _performTransaction(callback) {
@@ -22,7 +26,6 @@ class BaseRepository {
 
         return this.sequelize.transaction(bindedCallback);
     }
-
 
     _getdatabasePaginationParams(paginationParams) {
         return {

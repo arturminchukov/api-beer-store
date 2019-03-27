@@ -5,6 +5,7 @@ const brewsValidationSchema = require('./brewsValidationSchema');
 const addBrewValidationSchema = require('./addBrewValidationSchema');
 const userAuthenticationSchema = require('./userLoginSchema');
 const userRegistrationSchema = require('./userRegistrationSchema');
+const addBeerTypeValidationSchema = require('./addBeerTypeValidationSchema');
 
 module.exports = {
     beersValidationSchema,
@@ -13,5 +14,6 @@ module.exports = {
     userRegistrationSchema,
     brewValidationSchema,
     brewsValidationSchema,
-    addBrewValidationSchema
+    addBrewValidationSchema,
+    addBeerTypeValidationSchema
 };
