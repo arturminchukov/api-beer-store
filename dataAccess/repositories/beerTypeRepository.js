@@ -3,11 +3,10 @@ const {beerTypeModel} = require('../models');
 const sequelizeInstance = require('../getSequelize');
 const {NotFoundError} = require('../../errors');
 
-const sortOrder = [['name', 'ASC']];
-
 class BeerTypeRepository extends BaseRepository {
     constructor(sequelize) {
         super(sequelize, beerTypeModel.name);
+        this.sortOrder = [['name', 'ASC']];
     }
 
     async addBeerType(beerType) {
@@ -25,7 +24,7 @@ class BeerTypeRepository extends BaseRepository {
     async getAllBeerTypes() {
         try {
             const {count, rows: beerTypes} = await this.model.findAndCountAll({
-                order: sortOrder,
+                order: this.sortOrder,
                 raw: true
             });
 
