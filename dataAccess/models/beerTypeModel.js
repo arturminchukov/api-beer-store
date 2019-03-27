@@ -1,19 +1,15 @@
 const Sequelize = require('sequelize');
 
-const userModel = {
-    name: 'userBeer',
+const beerTypeModel = {
+    name: 'beerType',
     attributes: {
         id: {
             type: Sequelize.INTEGER,
             autoIncrement: true,
             primaryKey: true
         },
-        user_id: {
-            type: Sequelize.INTEGER,
-            allowNull: false
-        },
-        beer_id: {
-            type: Sequelize.INTEGER,
+        name: {
+            type: Sequelize.STRING(64),
             allowNull: false
         },
         created_at: {
@@ -30,8 +26,8 @@ const userModel = {
     options: {
         underscored: true,
         timestamps: true,
-        tableName: 'user_beers'
+        tableName: 'beer_types'
     }
 };
 
-module.exports = userModel;
+module.exports = beerTypeModel;

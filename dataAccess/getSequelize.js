@@ -1,6 +1,6 @@
 const GetSequelize = require('sequelize');
 const config = require('config');
-const {userModel, beerModel, userBeerModel} = require('./models');
+const {userModel, beerModel, userBeerModel, brewModel, beerTypeModel} = require('./models');
 
 const DATABASE = config.get('DB.NAME');
 const USERNAME = config.get('DB.USERNAME');
@@ -8,7 +8,7 @@ const PASSWORD = config.get('DB.PASSWORD');
 const PORT = config.get('DB.PORT');
 const HOST = config.get('DB.HOST');
 
-const models = [userModel, beerModel, userBeerModel];
+const models = [userModel, beerModel, userBeerModel, brewModel, beerTypeModel];
 
 const getSequelize = function (modelList) {
     const sequelize = new GetSequelize(DATABASE, USERNAME, PASSWORD, {
@@ -21,11 +21,13 @@ const getSequelize = function (modelList) {
         sequelize.define(model.name, model.attributes, model.options);
     });
 
-    const User = sequelize.models[userModel.name];
+    const Users = sequelize.models[userModel.name];
     const Beers = sequelize.models[beerModel.name];
+    const Brews = sequelize.models[brewModel.name];
+    const BeerTypes = sequelize.models[beerTypeModel.name];
     const UserBeers = sequelize.models[userBeerModel.name];
 
-    User.belongsToMany(Beers, {
+    Users.belongsToMany(Beers, {
         through: {
             model: UserBeers,
             unique: false
@@ -34,12 +36,17 @@ const getSequelize = function (modelList) {
         constraints: false
     });
 
-    Beers.belongsToMany(User, {
+    Beers.belongsToMany(Users, {
         through: {
             model: UserBeers,
             unique: false
         },
         foreignKey: 'beer_id',
+        constraints: false
+    });
+
+    Brews.belongsTo(BeerTypes, {
+        foreignKey: 'beer_type_id',
         constraints: false
     });
 
