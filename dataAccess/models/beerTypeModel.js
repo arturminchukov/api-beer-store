@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 
 const beerTypeModel = {
-    name: 'beer_type',
+    name: 'beerType',
     attributes: {
         id: {
             type: Sequelize.INTEGER,

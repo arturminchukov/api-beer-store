@@ -30,7 +30,7 @@ module.exports = {
                 impressions: {
                     type: 'string'
                 },
-                beer_type_id: {
+                beerTypeId: {
                     type: 'integer'
                 }
             }

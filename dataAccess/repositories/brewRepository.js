@@ -26,7 +26,7 @@ class BrewRepository extends BaseRepository {
             } = await this.model.findAndCountAll({
                 raw: true,
                 include: {
-                    model: this.sequelize.models.beer_type
+                    model: this.sequelize.models.beerType
                 },
                 ...databasePaginationParams
             }));
@@ -55,7 +55,7 @@ class BrewRepository extends BaseRepository {
                     id
                 },
                 include: {
-                    model: this.sequelize.models.beer_type
+                    model: this.sequelize.models.beerType
                 },
                 raw: true
             });
