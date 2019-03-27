@@ -21,10 +21,10 @@ const userModel = {
             type: Sequelize.STRING(512)
         },
         ingredients: {
-            type: Sequelize.TEXT
+            type: Sequelize.JSON
         },
         brewingMethod: {
-            type: Sequelize.TEXT,
+            type: Sequelize.JSON,
             field: 'brewing_method'
         },
         brewName: {
@@ -33,7 +33,7 @@ const userModel = {
             field: 'brew_name'
         },
         imagesCollection: {
-            type: Sequelize.TEXT,
+            type: Sequelize.JSON,
             field: 'images_collection'
         },
         impressions: {

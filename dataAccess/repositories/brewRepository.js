@@ -76,9 +76,9 @@ class BrewRepository extends BaseRepository {
 
     async addBrew(brew) {
         try {
-            const createdBrew = await this.model.create(brew, {raw: true});
+            const createdBrew = await this.model.create(brew);
 
-            return createdBrew;
+            return createdBrew.dataValues;
         } catch (error) {
             this._baseErrorHandler(error);
 

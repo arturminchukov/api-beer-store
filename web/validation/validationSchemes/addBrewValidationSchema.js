@@ -15,17 +15,17 @@ module.exports = {
                     maxLength: 512
                 },
                 ingredients: {
-                    type: 'string'
+                    type: 'object'
                 },
                 brewingMethod: {
-                    type: 'string'
+                    type: ['array', 'object']
                 },
                 brewName: {
                     type: 'string',
                     maxLength: 128
                 },
-                images_collection: {
-                    type: 'string'
+                imagesCollection: {
+                    type: 'array'
                 },
                 impressions: {
                     type: 'string'

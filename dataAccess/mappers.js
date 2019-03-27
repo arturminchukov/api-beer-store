@@ -46,7 +46,7 @@ const MAP_BREW_APPLICATION_PROPERTIES_TO_DATABASE = {
     ingredients: 'ingredients',
     brewingMethod: 'brewingMethod',
     brewName: 'brewName',
-    imagesCollection: 'imagesCollections',
+    imagesCollection: 'imagesCollection',
     impressions: 'impressions',
     'beer_type.name': 'beerType',
     createdAt: 'createdAt',
