@@ -1,6 +1,6 @@
 const GetSequelize = require('sequelize');
 const config = require('config');
-const {userModel, beerModel, userBeerModel, brewModel, beerTypeModel} = require('./models');
+const {userModel, beerModel, userBeerModel, brewModel, beerTypeModel, commentModel} = require('./models');
 
 const DATABASE = config.get('DB.NAME');
 const USERNAME = config.get('DB.USERNAME');
@@ -9,6 +9,29 @@ const PORT = config.get('DB.PORT');
 const HOST = config.get('DB.HOST');
 
 const models = [userModel, beerModel, userBeerModel, brewModel, beerTypeModel];
+
+const associateToMany = function (A, B, connectModel) {
+    const {model: modelA, foreignKey: foreignKeyA} = A;
+    const {model: modelB, foreignKey: foreignKeyB} = B;
+
+    modelA.belongsToMany(modelB, {
+        through: {
+            model: connectModel,
+            unique: false
+        },
+        foreignKey: foreignKeyA,
+        constraints: false
+    });
+
+    modelB.belongsToMany(modelA, {
+        through: {
+            model: connectModel,
+            unique: false
+        },
+        foreignKey: foreignKeyB,
+        constraints: false
+    });
+};
 
 const getSequelize = function (modelList) {
     const sequelize = new GetSequelize(DATABASE, USERNAME, PASSWORD, {
@@ -26,24 +49,23 @@ const getSequelize = function (modelList) {
     const Brews = sequelize.models[brewModel.name];
     const BeerTypes = sequelize.models[beerTypeModel.name];
     const UserBeers = sequelize.models[userBeerModel.name];
+    const Comments = sequelize.models[commentModel.name];
 
-    Users.belongsToMany(Beers, {
-        through: {
-            model: UserBeers,
-            unique: false
-        },
-        foreignKey: 'user_id',
-        constraints: false
-    });
+    associateToMany({
+        model: Users,
+        foreignKey: 'user_id'
+    }, {
+        model: Beers,
+        foreignKey: 'beer_id'
+    }, UserBeers);
 
-    Beers.belongsToMany(Users, {
-        through: {
-            model: UserBeers,
-            unique: false
-        },
-        foreignKey: 'beer_id',
-        constraints: false
-    });
+    associateToMany({
+        model: Brews,
+        foreignKey: 'brew_id'
+    }, {
+        model: Users,
+        foreignKey: 'user_id'
+    }, Comments);
 
     Brews.belongsTo(BeerTypes, {
         foreignKey: 'beer_type_id',

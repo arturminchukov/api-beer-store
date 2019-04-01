@@ -1,0 +1,8 @@
+CREATE TABLE comments (
+    id SERIAL PRIMARY KEY,
+    text TEXT NOT NULL,
+    brew_id INTEGER NOT NULL REFERENCES brews(id) ON DELETE CASCADE,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp,
+    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT current_timestamp
+)
