@@ -1,6 +1,12 @@
 const config = require('config');
 
-const server = require('./web/app');
+const app = require('./web/app');
+const configureWebsockets = require('./web/sockets');
+
+const server = require('http')
+    .createServer(app);
+
+configureWebsockets(server);
 
 const port = config.get('SERVER.PORT');
 

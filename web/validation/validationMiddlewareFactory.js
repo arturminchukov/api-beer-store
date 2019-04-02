@@ -1,7 +1,19 @@
 const Ajv = require('ajv');
 const {UnprocessableEntityError} = require('../../errors');
 
-const validationMiddlewareFactory = function (validationSchema, options) {
+const validate = function (options, data, validationSchema, next) {
+    const ajv = new Ajv(options);
+
+    const valid = ajv.validate(validationSchema, data);
+
+    if (!valid) {
+        return next(new UnprocessableEntityError('Invalid parameters', ajv.errors));
+    }
+
+    next();
+};
+
+const expressValidationMiddlewareFactory = function (validationSchema, options) {
     const defaultOptions = {
         coerceTypes: true,
         allErrors: true,
@@ -10,19 +22,30 @@ const validationMiddlewareFactory = function (validationSchema, options) {
     };
 
     return function (req, res, next) {
-        const ajv = new Ajv({
+        validate({
             ...defaultOptions,
-            ...options
-        });
-
-        const valid = ajv.validate(validationSchema, req);
-
-        if (!valid) {
-            return next(new UnprocessableEntityError('Invalid parameters', ajv.errors));
-        }
-
-        next();
+            options
+        }, req, validationSchema, next);
     };
 };
 
-module.exports = validationMiddlewareFactory;
+const socketValidationMiddlewareFactory = function (validationSchema, options) {
+    const defaultOptions = {
+        coerceTypes: true,
+        allErrors: true,
+        removeAdditional: true,
+        useDefaults: true
+    };
+
+    return function (socket, data, response, next) {
+        validate({
+            ...defaultOptions,
+            ...options
+        }, data, validationSchema, next);
+    };
+};
+
+module.exports = {
+    expressValidationMiddlewareFactory,
+    socketValidationMiddlewareFactory
+};

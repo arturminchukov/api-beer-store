@@ -8,6 +8,11 @@ module.exports = {
     SERVER: {
         PORT: 3030
     },
+    WEBSOCKET: {
+        PING_TIMEOUT: 5000,
+        PING_INTERVAL: 10000,
+        COOKIES: false
+    },
     EXTERNAL_RESOURCES: {
         API_URL: 'https://api.punkapi.com/v2'
     },

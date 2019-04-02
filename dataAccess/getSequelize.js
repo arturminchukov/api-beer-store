@@ -1,4 +1,4 @@
-const GetSequelize = require('sequelize');
+const Sequelize = require('sequelize');
 const config = require('config');
 const {userModel, beerModel, userBeerModel, brewModel, beerTypeModel, commentModel} = require('./models');
 
@@ -8,7 +8,7 @@ const PASSWORD = config.get('DB.PASSWORD');
 const PORT = config.get('DB.PORT');
 const HOST = config.get('DB.HOST');
 
-const models = [userModel, beerModel, userBeerModel, brewModel, beerTypeModel];
+const models = [userModel, beerModel, userBeerModel, brewModel, beerTypeModel, commentModel];
 
 const associateToMany = function (A, B, connectModel) {
     const {model: modelA, foreignKey: foreignKeyA} = A;
@@ -34,7 +34,7 @@ const associateToMany = function (A, B, connectModel) {
 };
 
 const getSequelize = function (modelList) {
-    const sequelize = new GetSequelize(DATABASE, USERNAME, PASSWORD, {
+    const sequelize = new Sequelize(DATABASE, USERNAME, PASSWORD, {
         dialect: 'postgres',
         host: HOST,
         port: PORT
