@@ -80,7 +80,7 @@ class BeerRepository extends BaseRepository {
         let databasePaginationParams = null;
 
         if (paginationParams) {
-            databasePaginationParams = this._getdatabasePaginationParams(paginationParams);
+            databasePaginationParams = this._getDatabasePaginationParams(paginationParams);
         }
 
         const {count, rows} = await this.model.findAndCountAll({
@@ -137,12 +137,7 @@ class BeerRepository extends BaseRepository {
             this._markFavoriteFlag(beers, favoriteBeers);
         }
 
-        return {
-            pageNumber: paginationParams.pageNumber,
-            pageSize: paginationParams.pageSize,
-            items: beers || [],
-            count
-        };
+        return this._performPaginatedData(beers, count, paginationParams);
     }
 
     async getBeerByExternalId(externalId, transaction) {

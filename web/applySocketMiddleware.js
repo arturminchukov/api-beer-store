@@ -9,7 +9,7 @@ const applySocketMiddleware = function (socket, errorHandler) {
             middlewareFunctions.push(() => {
                 const next = (error) => {
                     if (error) {
-                        errorHandler(socket, data, response, error);
+                        return errorHandler(socket, data, response, error);
                     }
                 };
 
@@ -20,7 +20,7 @@ const applySocketMiddleware = function (socket, errorHandler) {
                 middlewareFunctions.push(() => {
                     const next = (error) => {
                         if (error) {
-                            errorHandler(socket, data, response, error);
+                            return errorHandler(socket, data, response, error);
                         }
 
                         middlewareFunctions[j]();

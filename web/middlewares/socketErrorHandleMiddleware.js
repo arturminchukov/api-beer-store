@@ -16,7 +16,7 @@ const socketErrorHandleMiddleware = function (socket, data, response, error) {
         responseError.initError = error.initError;
     }
 
-    socket.send(responseError);
+    socket.emit('other', responseError);
 };
 
 module.exports = socketErrorHandleMiddleware;

@@ -1,4 +1,4 @@
-const {commentRouter} = require('./index');
+const {commentRouter} = require('./routers');
 
 const socketRouter = function (io) {
     io.on('connection', (socket) => {

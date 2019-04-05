@@ -12,13 +12,15 @@ const userModel = {
             type: Sequelize.TEXT,
             allowNull: false
         },
-        user_id: {
+        userId: {
             type: Sequelize.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'user_id'
         },
-        brew_id: {
+        brewId: {
             type: Sequelize.INTEGER,
-            allowNull: false
+            allowNull: false,
+            field: 'brew_id'
         },
         created_at: {
             type: Sequelize.DATE,

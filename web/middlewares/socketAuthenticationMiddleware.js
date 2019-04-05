@@ -3,13 +3,20 @@ const {AUTH_HEADER} = require('../constants');
 
 const socketAuthenticationMiddleware = async function (socket, data, response, next) {
     const tokenToCheck = data[AUTH_HEADER];
-    const {
-        token,
-        user
-    } = await authenticationService.authenticateByToken(tokenToCheck);
+    let token = null;
+    let user = null;
+
+    try {
+        ({
+            token,
+            user
+        } = await authenticationService.authenticateByToken(tokenToCheck));
+    } catch (error) {
+        return next(error);
+    }
 
     response[AUTH_HEADER] = token;
-    data.locals = user;
+    data.locals.user = user;
 
     next();
 };

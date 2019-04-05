@@ -17,8 +17,8 @@ const wrappedGetComments = routerWrapper(commentController.getComments);
 const commentRouter = function (socket) {
     const applyMiddleware = applySocketMiddleware(socket, socketErrorHandleMiddleware);
 
-    socket.on('add comment', applyMiddleware(getCommentsValidationMiddleware, socketAuthenticationMiddleware, wrappedAddComment));
-    socket.on('get comments', applyMiddleware(addCommentsValidationMiddleware, socketAuthenticationMiddleware, wrappedGetComments));
+    socket.on('add comment', applyMiddleware(addCommentsValidationMiddleware, socketAuthenticationMiddleware, wrappedAddComment));
+    socket.on('get comments', applyMiddleware(getCommentsValidationMiddleware, socketAuthenticationMiddleware, wrappedGetComments));
 };
 
 module.exports = commentRouter;
