@@ -40,3 +40,8 @@ parameters
     DEBUG - 'true' for debug mode
 
 `DBHOST=DBHOSTNAME  USER=USERNAME PASSWORD=PASSWORD DATABASE=DATABASENAME SERVER_PORT=SERVERPORT npm run start`
+
+## Usage
+
+[swagger api](https://app.swaggerhub.com/apis-docs/arturminchukov/swagger-beer_store/1.0.0) - v1\
+
