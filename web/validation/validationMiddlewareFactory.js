@@ -1,9 +1,7 @@
 const Ajv = require('ajv');
 const {UnprocessableEntityError} = require('../../errors');
 
-const validate = function (options, data, validationSchema, next) {
-    const ajv = new Ajv(options);
-
+const validate = function (ajv, data, validationSchema, next) {
     const valid = ajv.validate(validationSchema, data);
 
     if (!valid) {
@@ -21,11 +19,13 @@ const expressValidationMiddlewareFactory = function (validationSchema, options) 
         useDefaults: true
     };
 
+    const ajv = new Ajv({
+        ...defaultOptions,
+        ...options
+    });
+
     return function (req, res, next) {
-        validate({
-            ...defaultOptions,
-            options
-        }, req, validationSchema, next);
+        validate(ajv, req, validationSchema, next);
     };
 };
 
@@ -37,11 +37,13 @@ const socketValidationMiddlewareFactory = function (validationSchema, options) {
         useDefaults: true
     };
 
+    const ajv = new Ajv({
+        ...defaultOptions,
+        ...options
+    });
+
     return function (socket, data, response, next) {
-        validate({
-            ...defaultOptions,
-            ...options
-        }, data, validationSchema, next);
+        validate(ajv, data, validationSchema, next);
     };
 };
 

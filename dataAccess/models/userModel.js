@@ -19,38 +19,42 @@ const userModel = {
         password: {
             type: Sequelize.STRING(64)
         },
-        first_name: {
-            type: Sequelize.STRING(64)
+        firstName: {
+            type: Sequelize.STRING(64),
+            field: 'first_name'
         },
-        last_name: {
-            type: Sequelize.STRING(64)
+        lastName: {
+            type: Sequelize.STRING(64),
+            field: 'last_name'
         },
         birthday: {
             type: Sequelize.DATEONLY
         },
-        image_url: {
+        imageUrl: {
             type: Sequelize.STRING(512),
             validate: {
                 isUrl: true
-            }
+            },
+            field: 'image_url'
         },
         salt: {
             type: Sequelize.STRING(128),
             allowNull: false
         },
-        created_at: {
+        createdAt: {
             type: Sequelize.DATE,
             allowNull: false,
-            defaultValue: Sequelize.NOW
+            defaultValue: Sequelize.NOW,
+            field: 'created_at'
         },
-        updated_at: {
+        updatedAt: {
             type: Sequelize.DATE,
             allowNull: false,
-            defaultValue: Sequelize.NOW
+            defaultValue: Sequelize.NOW,
+            field: 'updated_at'
         }
     },
     options: {
-        underscored: true,
         timestamps: true,
         tableName: 'users'
     }

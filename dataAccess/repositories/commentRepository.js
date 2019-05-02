@@ -7,12 +7,9 @@ class CommentRepository extends BaseRepository {
         super(sequelize, commentModel.name);
     }
 
-    async addComment(userId, comment) {
+    async addComment(comment) {
         try {
-            const addedComment = await this.model.create({
-                userId,
-                ...comment
-            });
+            const addedComment = await this.model.create(comment);
 
             return addedComment.dataValues;
         } catch (error) {
@@ -34,11 +31,14 @@ class CommentRepository extends BaseRepository {
                 where: {
                     brewId
                 },
-                raw: true,
+                include: {
+                    model: this.sequelize.models.user,
+                    attributes: ['email', 'id', 'firstName', 'lastName']
+                },
                 ...databasePaginationParams
             });
 
-            return this._performPaginatedData(comments, count, paginationParams);
+            return this._paginateData(comments, count, paginationParams);
         } catch (error) {
             this._baseErrorHandler(error);
 

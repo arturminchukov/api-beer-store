@@ -59,13 +59,21 @@ const getSequelize = function (modelList) {
         foreignKey: 'beer_id'
     }, UserBeers);
 
-    associateToMany({
-        model: Brews,
-        foreignKey: 'brew_id'
-    }, {
-        model: Users,
-        foreignKey: 'user_id'
-    }, Comments);
+    Brews.hasMany(Comments, {
+        foreignKey: 'brewId',
+        constraints: false
+    });
+
+    Comments.belongsTo(Users, {
+        foreignKey: 'userId',
+        constraints: false
+    });
+
+    Comments.belongsTo(Brews, {
+        foreignKey: 'brewId',
+        constraints: false
+    });
+
 
     Brews.belongsTo(BeerTypes, {
         foreignKey: 'beer_type_id',

@@ -9,9 +9,9 @@ const expressRouterWrapper = function (routerHandler) {
 };
 
 const socketRouterWrapper = function (routerHandler) {
-    return async function (socket, data, response, next) {
+    return async function (socket, req, response, next) {
         try {
-            await routerHandler(socket, data, response);
+            await routerHandler(socket, req, response);
         } catch (error) {
             next(error);
         }

@@ -2,7 +2,10 @@ const {commentRepository} = require('../../dataAccess/repositories');
 
 class CommentService {
     addComment(user, comment) {
-        return commentRepository.addComment(user.id, comment);
+        return commentRepository.addComment({
+            ...comment,
+            userId: user.id
+        });
     }
 
     getComments(brewId, paginationParams) {

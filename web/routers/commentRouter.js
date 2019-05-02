@@ -2,7 +2,7 @@ const applySocketMiddleware = require('../applySocketMiddleware');
 const {commentController} = require('../controllers');
 const {socketRouterWrapper: routerWrapper} = require('../routerWrapper');
 
-const {socketAuthenticationMiddleware, socketErrorHandleMiddleware} = require('../middlewares');
+const {socketErrorHandleMiddleware} = require('../middlewares');
 const {validationMiddlewareFactory, validationSchemes} = require('../validation');
 
 const {getCommentsValidationSchema, addCommentValidationSchema} = validationSchemes;
@@ -17,8 +17,8 @@ const wrappedGetComments = routerWrapper(commentController.getComments);
 const commentRouter = function (socket) {
     const applyMiddleware = applySocketMiddleware(socket, socketErrorHandleMiddleware);
 
-    socket.on('add comment', applyMiddleware(addCommentsValidationMiddleware, socketAuthenticationMiddleware, wrappedAddComment));
-    socket.on('get comments', applyMiddleware(getCommentsValidationMiddleware, socketAuthenticationMiddleware, wrappedGetComments));
+    socket.on('addComment', applyMiddleware('addComment')(addCommentsValidationMiddleware, wrappedAddComment));
+    socket.on('getComments', applyMiddleware('getComments')(getCommentsValidationMiddleware, wrappedGetComments));
 };
 
 module.exports = commentRouter;

@@ -15,19 +15,6 @@ const MAP_PAGE_PARAMS = {
     pageSize: 'per_page'
 };
 
-const MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE = {
-    id: 'id',
-    email: 'email',
-    password: 'password',
-    firstName: 'first_name',
-    lastName: 'last_name',
-    birthday: 'birthday',
-    imageUrl: 'image_url',
-    salt: 'salt'
-};
-
-const MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION = revertMap(MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE);
-
 const MAP_BEER_APPLICATION_PROPERTIES_TO_DATABASE = {
     id: 'external_id',
     name: 'name',
@@ -56,8 +43,6 @@ const MAP_BREW_APPLICATION_PROPERTIES_TO_DATABASE = {
 module.exports = {
     MAP_FILTER_PARAMS,
     MAP_PAGE_PARAMS,
-    MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE,
-    MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION,
     MAP_BEER_APPLICATION_PROPERTIES_TO_DATABASE,
     MAP_BEER_DATABASE_PROPERTIES_TO_APLLICATION,
     MAP_BREW_APPLICATION_PROPERTIES_TO_DATABASE

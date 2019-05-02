@@ -27,7 +27,7 @@ class BaseRepository {
         return this.sequelize.transaction(bindedCallback);
     }
 
-    _performPaginatedData(data, count, paginationParams) {
+    _paginateData(data, count, paginationParams) {
         return {
             count,
             items: data || [],

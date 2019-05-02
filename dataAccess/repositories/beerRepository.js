@@ -137,7 +137,7 @@ class BeerRepository extends BaseRepository {
             this._markFavoriteFlag(beers, favoriteBeers);
         }
 
-        return this._performPaginatedData(beers, count, paginationParams);
+        return this._paginateData(beers, count, paginationParams);
     }
 
     async getBeerByExternalId(externalId, transaction) {

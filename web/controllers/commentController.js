@@ -1,23 +1,23 @@
 const {commentService} = require('../../application/services');
 
 class CommentController {
-    async addComment(socket, data, response) {
-        const {comment} = data;
-        const {user} = data.locals;
+    async addComment(socket, req, response) {
+        const {comment} = req;
+        const {user} = socket.locals;
 
         const addedComment = await commentService.addComment(user, comment);
 
         response.payload = addedComment;
-        socket.emit('add comment', response);
+        socket.emit('addedComment', response);
     }
 
-    async getComments(socket, data, response) {
-        const {brewId, ...paginationParams} = data.params;
+    async getComments(socket, req, response) {
+        const {brewId, ...paginationParams} = req.params;
         const paginatedComments = await commentService.getComments(brewId, paginationParams);
 
         response.payload = paginatedComments;
 
-        socket.emit('get comments', response);
+        socket.emit('gotComments', response);
     }
 }
 

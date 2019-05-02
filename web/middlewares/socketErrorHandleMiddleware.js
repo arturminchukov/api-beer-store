@@ -2,7 +2,7 @@ const config = require('config');
 
 const DEBUG = config.get('DEBUG');
 
-const socketErrorHandleMiddleware = function (socket, data, response, error) {
+const socketErrorHandleMiddleware = function (socket, data, response, {error, eventName}) {
     const responseError = {
         statusCode: error.statusCode,
         message: error.message
@@ -16,7 +16,10 @@ const socketErrorHandleMiddleware = function (socket, data, response, error) {
         responseError.initError = error.initError;
     }
 
-    socket.emit('other', responseError);
+    socket.emit('serverError', {
+        error: responseError,
+        eventName
+    });
 };
 
 module.exports = socketErrorHandleMiddleware;

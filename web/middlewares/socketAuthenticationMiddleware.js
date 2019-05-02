@@ -1,24 +1,18 @@
 const {authenticationService} = require('../../application/services');
 const {AUTH_HEADER} = require('../constants');
 
-const socketAuthenticationMiddleware = async function (socket, data, response, next) {
-    const tokenToCheck = data[AUTH_HEADER];
-    let token = null;
+const socketAuthenticationMiddleware = async function (socket) {
+    const tokenToCheck = socket.handshake.query[AUTH_HEADER];
     let user = null;
 
     try {
-        ({
-            token,
-            user
-        } = await authenticationService.authenticateByToken(tokenToCheck));
+        ({user} = await authenticationService.authenticateByToken(tokenToCheck));
     } catch (error) {
-        return next(error);
+        socket.close();
     }
 
-    response[AUTH_HEADER] = token;
-    data.locals.user = user;
-
-    next();
+    socket.locals = {user};
+    return user;
 };
 
 module.exports = socketAuthenticationMiddleware;
