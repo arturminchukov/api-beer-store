@@ -16,7 +16,7 @@ class BrewRepository extends BaseRepository {
         let count = null;
 
         if (paginationParams) {
-            databasePaginationParams = this._getdatabasePaginationParams(paginationParams);
+            databasePaginationParams = this._getDatabasePaginationParams(paginationParams);
         }
 
         try {
@@ -38,12 +38,7 @@ class BrewRepository extends BaseRepository {
 
         brews = brews.map(brew => mapper(brew, MAP_BREW_APPLICATION_PROPERTIES_TO_DATABASE));
 
-        return {
-            count,
-            items: brews || [],
-            pageNumber: paginationParams.pageNumber,
-            pageSize: paginationParams.pageSize
-        };
+        return this._paginateData(brews, count, paginationParams);
     }
 
     async getBrewById(id) {

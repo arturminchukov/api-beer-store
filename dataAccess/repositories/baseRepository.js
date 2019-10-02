@@ -27,7 +27,16 @@ class BaseRepository {
         return this.sequelize.transaction(bindedCallback);
     }
 
-    _getdatabasePaginationParams(paginationParams) {
+    _paginateData(data, count, paginationParams) {
+        return {
+            count,
+            items: data || [],
+            pageNumber: paginationParams.pageNumber,
+            pageSize: paginationParams.pageSize
+        };
+    }
+
+    _getDatabasePaginationParams(paginationParams) {
         return {
             limit: paginationParams.pageSize,
             offset: (paginationParams.pageNumber - 1) * paginationParams.pageSize,

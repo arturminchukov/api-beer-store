@@ -1,8 +1,6 @@
 const sequelizeInstance = require('../getSequelize');
 const {userModel} = require('../models');
-const {mapper} = require('../../helpers');
 const {SQL_ERRORS} = require('../constants');
-const {MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION} = require('../mappers');
 const {NotFoundError, UnprocessableEntityError} = require('../../errors');
 const BaseRepository = require('./baseRepository');
 
@@ -14,16 +12,15 @@ class UserRepository extends BaseRepository {
     async getUserEntity(searchCriteria) {
         const user = await this.getUser(searchCriteria);
 
-        return mapper(user.dataValues, MAP_USER_DATABASE_PROPERTIES_TO_APPLICATION);
+        return user.dataValues;
     }
 
     async getUser(searchCriteria, transaction) {
-        const mappedSearchCriteria = mapper(searchCriteria, MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE);
         let user = null;
 
         try {
             user = await this.model.findOne({
-                where: mappedSearchCriteria,
+                where: searchCriteria,
                 transaction
             });
         } catch (error) {
@@ -40,10 +37,8 @@ class UserRepository extends BaseRepository {
     }
 
     async createUser(user) {
-        const userProperties = mapper(user, MAP_USER_APPLICATION_PROPERTIES_TO_DATABASE);
-
         try {
-            const createdUser = await this.model.create(userProperties);
+            const createdUser = await this.model.create(user);
 
             return createdUser;
         } catch (error) {
